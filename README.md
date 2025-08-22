@@ -1,6 +1,7 @@
 # Blog Platform  
 
-This is a full-stack blog application built with **MERN stack** (MongoDB, Express, React, Node.js). The platform allows users to create, read, and interact with blogs, while providing an **admin panel** to manage blogs, comments, and users.  
+This is a full-stack blog application built with **MERN stack** (MongoDB, Express, React, Node.js). The platform allows users to create, read, and interact with blogs, while providing an **admin panel** to manage blogs, comments, and users.
+This project uses MongoDB Atlas for database storage. Make sure to create a cluster and get your connection string for the .env file
 
 The project is divided into two parts:  
 - **Frontend** (React + Tailwind CSS)  
