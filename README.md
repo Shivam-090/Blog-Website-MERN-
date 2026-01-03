@@ -36,7 +36,7 @@ The project is divided into two parts:
 
 ## **🚀 Live Demo**
 
-https://blog-website-mern-9qdm.vercel.app/
+https://blog-website-mern-x6jv.vercel.app/
 
 ---
 
