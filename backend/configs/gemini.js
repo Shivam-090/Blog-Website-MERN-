@@ -7,17 +7,15 @@ const ai = new GoogleGenAI({
 async function main(prompt) {
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
-            contents: [{
-                role: "user",
-                parts: [{ text: prompt }]
-            }]
+            model: "gemini-2.5-flash",
+            contents: prompt
         });
-        return response.candidates[0].content.parts[0].text;
-        
+
+        return response.text;
+
     } catch (error) {
         console.error('Gemini API Error:', error);
-        throw new Error('Failed to generate content');
+        throw new Error(error.message || 'Failed to generate content');
     }
 }
 
