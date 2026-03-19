@@ -3,8 +3,9 @@ import cors from 'cors';
 import 'dotenv/config';
 import { connect } from 'mongoose';
 import connectDB from './configs/db.js';
-import adminRouter from './routes/adminRoutes.js';
+import writerRouter from './routes/writerRoutes.js';
 import blogRouter from './routes/blogRoutes.js';
+import userRouter from './routes/userRoutes.js';
 
 const app = express();
 
@@ -18,8 +19,9 @@ app.use(express.json())
 
 // Routes
 app.get('/', (req, res)=> res.send('working'))
-app.use('/api/admin', adminRouter)
+app.use('/api/writer', writerRouter)
 app.use('/api/blog', blogRouter)
+app.use('/api/user', userRouter)
 
 const PORT = process.env.PORT || 3000;
 

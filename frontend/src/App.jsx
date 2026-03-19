@@ -2,20 +2,23 @@ import React from "react"
 import { Routes, Route } from "react-router-dom"
 import Home from "./pages/Home.jsx"
 import Blog from "./pages/Blog.jsx"
-import Layout from "./pages/admin/Layout.jsx"
-import Dashboard from "./pages/admin/Dashboard.jsx"
-import AddBlog from "./pages/admin/AddBlog.jsx"
-import ListBlog from "./pages/admin/ListBlog.jsx"
-import Comments from "./pages/admin/Comments.jsx"
-import Login from "./components/admin/Login.jsx"
+import Auth from "./pages/Auth.jsx"
+import Profile from "./pages/Profile.jsx"
+import WriterLayout from "./pages/writer/WriterLayout.jsx"
+import WriterDashboard from "./pages/writer/WriterDashboard.jsx"
+import WriterAddBlog from "./pages/writer/WriterAddBlog.jsx"
+import WriterListBlog from "./pages/writer/WriterListBlog.jsx"
+import WriterComments from "./pages/writer/WriterComments.jsx"
+import WriterProfile from "./pages/writer/WriterProfile.jsx"
+import WriterAuth from "./components/writer/WriterAuth.jsx"
 import {Toaster} from 'react-hot-toast'
 
 import 'quill/dist/quill.snow.css'
-import { useAppContext } from "./context/AppContext.jsx"
+import { useAppContext } from "./context/useAppContext.js"
 
 function App() {
 
-  const {token} = useAppContext()
+  const {writerToken} = useAppContext()
   
 
   return (
@@ -25,11 +28,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/blog/:id" element={<Blog />} />
-        <Route path='/admin' element={token ? <Layout />: <Login/>}> 
-        <Route index element={<Dashboard/>}/>
-        <Route path='addBlog' element={<AddBlog/>}/>
-        <Route path='listBlog' element={<ListBlog/>}/>
-        <Route path='comments' element={<Comments/>}/>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path='/writer' element={writerToken ? <WriterLayout />: <WriterAuth/>}> 
+        <Route index element={<WriterDashboard/>}/>
+        <Route path='profile' element={<WriterProfile/>}/>
+        <Route path='addBlog' element={<WriterAddBlog/>}/>
+        <Route path='listBlog' element={<WriterListBlog/>}/>
+        <Route path='comments' element={<WriterComments/>}/>
 
         </Route>
       </Routes>

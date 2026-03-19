@@ -9,9 +9,9 @@ const Footer = () => {
       <div className='flex flex-col md:flex-row items-start justify-between gap-19 py-10 border-b border-gray-500/30 text-gray-500'>
       <div >
         <img src={assets.logo} alt="logo" className='w-6 sm:w-10' />
-        <p className='max-w-[410px] mt-6'>Welcome to Blog-Test, a space for fresh ideas, inspiring stories, and practical tips. Whether you're here to learn, reflect, or be inspired, you'll always find something worth reading.</p>
+        <p className='max-w-[410px] mt-6'>Welcome to Blog-Test, a space for fresh ideas, inspiring stories, and practical tips. Whether you&apos;re here to learn, reflect, or be inspired, you&apos;ll always find something worth reading.</p>
       </div>
-      <div className='flex flex-wrap justify-between w-full md:w-[45%] gap-5'>
+      <div className='flex flex-wrap justify-between w-full md:w-[45%] gap-8'>
         {footer_data.map((section, index) => (
             <div key={index}>
                 <h3 className='font-semibold text-base text-gray-900 md:mb-5 mb-2'>{section.title}</h3>
@@ -29,9 +29,8 @@ const Footer = () => {
 
 
       </div>
-      <p className='py-4 text-center text-sm md:text-base text-gray-500'> Copyright 2025 &copy; Blog Test-work - All rights reserved.
+      <p className='py-4 text-center text-sm md:text-base text-gray-500'> Copyright 2025 &copy; Blog Test-work - All rights reserved.</p>
 
-      </p>
     </div>
   )
 }

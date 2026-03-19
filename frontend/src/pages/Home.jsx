@@ -8,10 +8,9 @@ import Footer from '../components/Footer.jsx'
 const Home = () => {
   return (
     <>
-   
       <Navbar />
       <Header />
-      <BlogList /> 
+      <BlogList />
       <Newsletter />
       <Footer />
     </>

@@ -5,25 +5,25 @@ const getTokenFromHeader = (authorization) => {
     return authorization.startsWith('Bearer ') ? authorization.slice(7) : authorization;
 };
 
-const auth = (req, res, next) => {
+const userAuth = (req, res, next) => {
     const token = getTokenFromHeader(req.headers.authorization);
 
     try {
         if (!token) {
-            return res.status(401).json({ success: false, message: "Unauthorized access" });
+            return res.status(401).json({ success: false, message: "Please login to continue" });
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        if (decoded.role !== 'writer' || !decoded.writerId) {
-            return res.status(403).json({ success: false, message: "Writer access required" });
+        if (decoded.role !== 'user' || !decoded.userId) {
+            return res.status(403).json({ success: false, message: "User access required" });
         }
 
-        req.writer = decoded;
+        req.user = decoded;
         next();
     } catch (error) {
-        res.status(401).json({ success: false, message: "Unauthorized access" });
+        res.status(401).json({ success: false, message: "Please login to continue" });
     }
-}
+};
 
-export default auth;
+export default userAuth;
