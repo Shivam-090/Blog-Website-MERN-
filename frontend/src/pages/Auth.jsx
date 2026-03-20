@@ -3,6 +3,7 @@ import { KeyRound, Mail, MessageSquareText, Phone, UserRound } from 'lucide-reac
 import { useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAppContext } from '../context/useAppContext'
+import { validateReaderAuth, validateReaderReset } from '../utils/authValidation'
 
 const Auth = () => {
   const location = useLocation()
@@ -10,6 +11,7 @@ const Auth = () => {
   const [mode, setMode] = useState('login')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [resetStep, setResetStep] = useState(1)
+  const [errors, setErrors] = useState({})
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,28 +32,51 @@ const Auth = () => {
   const updateField = (event) => {
     const { name, value } = event.target
     setFormData((current) => ({ ...current, [name]: value }))
+    setErrors((current) => {
+      if (!current[name]) {
+        return current
+      }
+
+      const nextErrors = { ...current }
+      delete nextErrors[name]
+      return nextErrors
+    })
   }
 
   const switchMode = (nextMode) => {
     setMode(nextMode)
     setResetStep(1)
+    setErrors({})
   }
+
+  const getInputClassName = (fieldName) =>
+    `w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)] ${
+      errors[fieldName] ? 'border border-red-400 focus:shadow-[0_0_0_3px_rgba(248,113,113,0.2)]' : ''
+    }`
 
   const handleAuthSubmit = async (event) => {
     event.preventDefault()
+    const validationErrors = validateReaderAuth(mode, formData)
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      toast.error('Please fix the highlighted fields')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
       if (mode === 'signup') {
         await signupUser({
-          name: formData.name,
-          email: formData.email,
-          mobile: formData.mobile,
-          password: formData.password
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          mobile: formData.mobile.trim(),
+          password: formData.password.trim()
         })
         toast.success('Your reader account is ready')
       } else {
-        await loginUser({ email: formData.email, password: formData.password })
+        await loginUser({ email: formData.email.trim().toLowerCase(), password: formData.password })
         toast.success('Welcome back')
       }
 
@@ -65,12 +90,21 @@ const Auth = () => {
 
   const handleVerifyEmail = async (event) => {
     event.preventDefault()
+    const validationErrors = validateReaderReset(1, formData)
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      toast.error('Please enter a valid email')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      const message = await verifyResetEmail(formData.resetEmail)
+      const message = await verifyResetEmail(formData.resetEmail.trim().toLowerCase())
       toast.success(message)
       setResetStep(2)
+      setErrors({})
     } catch (error) {
       toast.error(error.message)
     } finally {
@@ -80,19 +114,28 @@ const Auth = () => {
 
   const handleResetPassword = async (event) => {
     event.preventDefault()
+    const validationErrors = validateReaderReset(2, formData)
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      toast.error('Please fix the highlighted fields')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
       const message = await resetPassword({
-        email: formData.resetEmail,
-        newPassword: formData.newPassword
+        email: formData.resetEmail.trim().toLowerCase(),
+        newPassword: formData.newPassword.trim()
       })
       toast.success(message)
       setMode('login')
       setResetStep(1)
+      setErrors({})
       setFormData((current) => ({
         ...current,
-        email: current.resetEmail,
+        email: current.resetEmail.trim().toLowerCase(),
         password: '',
         newPassword: ''
       }))
@@ -137,9 +180,10 @@ const Auth = () => {
                           onChange={updateField}
                           placeholder="Enter E-Mail"
                           required
-                          className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                          className={getInputClassName('resetEmail')}
                         />
                       </div>
+                      {errors.resetEmail ? <p className="text-sm text-red-500">{errors.resetEmail}</p> : null}
                       <button
                         type="submit"
                         disabled={isSubmitting}
@@ -159,9 +203,10 @@ const Auth = () => {
                           onChange={updateField}
                           placeholder="Enter New Password"
                           required
-                          className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                          className={getInputClassName('newPassword')}
                         />
                       </div>
+                      {errors.newPassword ? <p className="text-sm text-red-500">{errors.newPassword}</p> : null}
                       <button
                         type="submit"
                         disabled={isSubmitting}
@@ -219,9 +264,10 @@ const Auth = () => {
                         onChange={updateField}
                         placeholder="Enter E-Mail"
                         required
-                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                        className={getInputClassName('email')}
                       />
                     </div>
+                    {errors.email ? <p className="text-sm text-red-500">{errors.email}</p> : null}
                     <div className="relative">
                       <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                       <input
@@ -231,9 +277,10 @@ const Auth = () => {
                         onChange={updateField}
                         placeholder="Enter Password"
                         required
-                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                        className={getInputClassName('password')}
                       />
                     </div>
+                    {errors.password ? <p className="text-sm text-red-500">{errors.password}</p> : null}
                   </div>
 
                   <button
@@ -275,9 +322,10 @@ const Auth = () => {
                         onChange={updateField}
                         placeholder="Enter Full Name"
                         required
-                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                        className={getInputClassName('name')}
                       />
                     </div>
+                    {errors.name ? <p className="text-sm text-red-500">{errors.name}</p> : null}
                     <div className="relative">
                       <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                       <input
@@ -287,9 +335,10 @@ const Auth = () => {
                         onChange={updateField}
                         placeholder="Enter Mobile Number"
                         required
-                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                        className={getInputClassName('mobile')}
                       />
                     </div>
+                    {errors.mobile ? <p className="text-sm text-red-500">{errors.mobile}</p> : null}
                     <div className="relative">
                       <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                       <input
@@ -299,9 +348,10 @@ const Auth = () => {
                         onChange={updateField}
                         placeholder="Enter E-Mail"
                         required
-                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                        className={getInputClassName('email')}
                       />
                     </div>
+                    {errors.email ? <p className="text-sm text-red-500">{errors.email}</p> : null}
                     <div className="relative">
                       <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                       <input
@@ -311,9 +361,10 @@ const Auth = () => {
                         onChange={updateField}
                         placeholder="Create Password"
                         required
-                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                        className={getInputClassName('password')}
                       />
                     </div>
+                    {errors.password ? <p className="text-sm text-red-500">{errors.password}</p> : null}
                   </div>
 
                   <button
