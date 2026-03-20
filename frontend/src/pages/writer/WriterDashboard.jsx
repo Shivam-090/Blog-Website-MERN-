@@ -28,7 +28,7 @@ const WriterDashboard = () => {
   }, [fetchDashboard])
 
   return (
-    <div className='flex-1 bg-[#f6f6ff] p-4 md:p-10'>
+    <div className='min-w-0 flex-1 bg-[#f6f6ff] p-4 md:p-10'>
       <div className='mb-8'>
         <p className='text-xs font-bold uppercase tracking-[0.22em] text-[#8d88b5]'>Overview</p>
         <h1 className='mt-3 font-[Manrope] text-3xl font-extrabold tracking-[-0.04em] text-slate-900'>Writer dashboard</h1>

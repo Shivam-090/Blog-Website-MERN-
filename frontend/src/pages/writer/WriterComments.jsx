@@ -22,8 +22,8 @@ const WriterComments = () => {
   }, [fetchComments])
 
   return (
-    <div className='flex-1 bg-[#f6f6ff] px-5 pt-5 sm:pl-16 sm:pt-12'>
-      <div className='flex max-w-3xl items-center justify-between'>
+    <div className='min-w-0 flex-1 bg-[#f6f6ff] px-5 pt-5 sm:pl-16 sm:pt-12'>
+      <div className='flex max-w-3xl flex-wrap items-center justify-between gap-4'>
         <div>
           <p className='text-xs font-bold uppercase tracking-[0.22em] text-[#8d88b5]'>Community</p>
           <h1 className='mt-3 font-[Manrope] text-3xl font-extrabold tracking-[-0.04em] text-slate-900'>Comments on your blogs</h1>
@@ -34,7 +34,7 @@ const WriterComments = () => {
         </div>
       </div>
 
-      <div className='relative mt-6 h-4/5 max-w-3xl overflow-x-auto rounded-[1.75rem] bg-white/85 shadow-[0_20px_50px_rgba(39,46,66,0.06)] scrollbar-hide'>
+      <div className='relative mt-6 max-w-3xl overflow-x-auto rounded-[1.75rem] bg-white/85 shadow-[0_20px_50px_rgba(39,46,66,0.06)] scrollbar-hide'>
         <table className='w-full text-sm text-slate-600 '>
           <thead className='text-left text-[11px] uppercase tracking-[0.18em] text-slate-400'>
             <tr>

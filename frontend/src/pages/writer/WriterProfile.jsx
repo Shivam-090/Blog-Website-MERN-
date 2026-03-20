@@ -76,7 +76,7 @@ const WriterProfile = () => {
   }
 
   return (
-    <div className="flex-1 bg-[#f6f6ff] p-4 md:p-8 xl:p-10">
+    <div className="min-w-0 flex-1 bg-[#f6f6ff] p-4 md:p-8 xl:p-10">
       
 
         <section className="space-y-6">

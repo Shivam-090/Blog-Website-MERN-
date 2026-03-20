@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import Moment from 'moment'
-import { AtSign, Heart, KeyRound, Mail, MessageSquareText, Bookmark, UserRound } from 'lucide-react'
+import { AtSign, Heart, KeyRound, Mail, MessageSquareText, Bookmark, UserRound, Menu } from 'lucide-react'
 import toast from 'react-hot-toast'
 import UserSidebar from '../components/UserSidebar'
 import { useAppContext } from '../context/useAppContext'
@@ -8,6 +8,7 @@ import { useAppContext } from '../context/useAppContext'
 const Profile = () => {
   const { userToken, userProfile, fetchUserProfile, updateUserPassword, navigate, user } = useAppContext()
   const [activeSection, setActiveSection] = useState('overview')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
   const [passwordForm, setPasswordForm] = useState({
@@ -34,6 +35,14 @@ const Profile = () => {
 
     loadProfile()
   }, [fetchUserProfile, navigate, userToken])
+
+  useEffect(() => {
+    document.body.style.overflow = isSidebarOpen ? 'hidden' : ''
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isSidebarOpen])
 
   const stats = useMemo(() => ({
     liked: userProfile?.likedBlogs?.length || 0,
@@ -242,10 +251,20 @@ const Profile = () => {
 
   return (
     <>
-      <div onClick={() => navigate('/')} className='flex h-[76px] cursor-pointer items-center justify-between border-b border-[#e7e6fb] bg-white/90 px-4 py-2 backdrop-blur sm:px-12'>
-        <span>
+      <div className='flex h-[76px] items-center justify-between border-b border-[#e7e6fb] bg-white/90 px-4 py-2 backdrop-blur sm:px-12'>
+        <div className='flex items-center gap-3'>
+          <button
+            type='button'
+            onClick={() => setIsSidebarOpen(true)}
+            className='flex h-11 w-11 items-center justify-center rounded-full bg-[#f3f1ff] text-[#702ae1] md:hidden'
+            aria-label='Open user sidebar'
+          >
+            <Menu className='h-5 w-5' />
+          </button>
+        <span onClick={() => navigate('/')} className='cursor-pointer'>
           <span className='font-bold text-black md:text-2xl'>Digital</span> <span className='font-bold italic text-[#702ae1] md:text-2xl'>Ethereal</span>
         </span>
+        </div>
         <div className='text-right'>
           <p className='text-[11px] font-bold uppercase tracking-[0.22em] text-[#8d88b5]'>Reader workspace</p>
           <p className='text-sm font-semibold text-slate-800'>{user?.name || 'User'}</p>
@@ -253,9 +272,9 @@ const Profile = () => {
       </div>
 
       <div className='flex min-h-[calc(100vh-76px)] bg-[#f6f6ff]'>
-        <UserSidebar activeSection={activeSection} setActiveSection={setActiveSection} stats={stats} />
+        <UserSidebar activeSection={activeSection} setActiveSection={setActiveSection} stats={stats} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-        <div className='flex-1 p-4 md:p-10'>
+        <div className='min-w-0 flex-1 p-4 md:p-10'>
 
 
           {renderContent()}

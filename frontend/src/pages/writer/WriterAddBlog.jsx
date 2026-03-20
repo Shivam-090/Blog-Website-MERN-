@@ -87,8 +87,8 @@ const WriterAddBlog = () => {
   },[])
 
   return (
-    <form onSubmit={onSubmitHandler} className='flex h-[950px] w-[100vw] overflow-scroll bg-[#f6f6ff] text-slate-600'>
-      <div className='m-4 w-full max-w-3xl rounded-[2rem] bg-white/85 p-4 shadow-[0_20px_50px_rgba(39,46,66,0.06)] sm:m-10 md:p-10'>
+    <div className='min-w-0 flex-1 overflow-x-hidden bg-[#f6f6ff] p-4 text-slate-600 md:p-10'>
+      <form onSubmit={onSubmitHandler} className='w-full max-w-3xl rounded-[2rem] bg-white/85 p-4 shadow-[0_20px_50px_rgba(39,46,66,0.06)] md:p-10'>
         <p className='text-xs font-bold uppercase tracking-[0.22em] text-[#8d88b5]'>Create story</p>
         <h1 className='mt-3 font-[Manrope] text-3xl font-extrabold tracking-[-0.04em] text-slate-900'>Add a new blog</h1>
 
@@ -102,7 +102,7 @@ const WriterAddBlog = () => {
         <p className='mt-5 text-sm font-semibold text-slate-700'>Sub title</p>
         <input type="text" placeholder='Type here' required className='mt-2 w-full max-w-lg rounded-2xl border border-[#dddff2] bg-[#f7f8ff] p-3 outline-none transition focus:border-[#b28cff]' onChange={(e)=>setSubTitle(e.target.value)} value={subTitle}/>
         <p className='mt-5 text-sm font-semibold text-slate-700'>Blog Description</p>
-        <div className='max-w-lg h-74 pb-16 sm:pb-10 pt-2 relative'>
+        <div className='relative max-w-lg pb-16 pt-2 sm:pb-10'>
           <div ref={editorRef}></div>
           <button disabled={loading} className='absolute bottom-1 right-2 ml-2 cursor-pointer rounded-full bg-[linear-gradient(135deg,#702ae1,#b28cff)] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_16px_30px_rgba(112,42,225,0.18)]' type='button' onClick={generateContent} >Generate with AI</button>
         </div>
@@ -118,8 +118,8 @@ const WriterAddBlog = () => {
         <div>
           <button disabled={isAdding} type='submit' className='mt-8 h-11 w-40 cursor-pointer rounded-full bg-[linear-gradient(135deg,#702ae1,#b28cff)] text-sm font-bold text-white shadow-[0_18px_34px_rgba(112,42,225,0.2)]'>{isAdding ? 'Adding...': 'Add Blog'}</button>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }
 
