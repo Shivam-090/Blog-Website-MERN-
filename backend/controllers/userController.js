@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import Blog from '../models/Blog.js';
 import Comment from '../models/Comment.js';
 import User from '../models/User.js';
+import Writer from '../models/Writer.js';
 
 const hashPassword = (password) => {
     const salt = crypto.randomBytes(16).toString('hex');
@@ -17,7 +18,7 @@ const verifyPassword = (password, storedPassword) => {
 };
 
 const createUserToken = (user) => jwt.sign(
-    { userId: user._id, email: user.email, role: 'user' },
+    { userId: user._id, email: user.email, mobile: user.mobile, role: 'user' },
     process.env.JWT_SECRET
 );
 
@@ -25,9 +26,11 @@ const sanitizeUser = (user) => ({
     _id: user._id,
     name: user.name,
     email: user.email,
+    mobile: user.mobile,
     savedBlogs: user.savedBlogs,
     likedBlogs: user.likedBlogs,
     dislikedBlogs: user.dislikedBlogs,
+    followingWriters: user.followingWriters,
     createdAt: user.createdAt
 });
 
@@ -46,7 +49,7 @@ const buildBlogSummary = async (blogIds) => {
 };
 
 const buildProfilePayload = async (user) => {
-    const [likedBlogs, savedBlogs, comments] = await Promise.all([
+    const [likedBlogs, savedBlogs, comments, followingWriters] = await Promise.all([
         buildBlogSummary(user.likedBlogs),
         buildBlogSummary(user.savedBlogs),
         Comment.find({ user: user._id })
@@ -55,6 +58,9 @@ const buildProfilePayload = async (user) => {
                 match: { isPublished: true }
             })
             .sort({ createdAt: -1 })
+            .lean(),
+        Writer.find({ _id: { $in: user.followingWriters || [] } })
+            .select('name username description createdAt')
             .lean()
     ]);
 
@@ -62,6 +68,7 @@ const buildProfilePayload = async (user) => {
         user: sanitizeUser(user),
         likedBlogs,
         savedBlogs,
+        followingWriters,
         comments: comments
             .filter((comment) => comment.blog)
             .map((comment) => ({
@@ -76,9 +83,9 @@ const buildProfilePayload = async (user) => {
 
 export const signupUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, mobile, password } = req.body;
 
-        if (!name || !email || !password) {
+        if (!name || !email || !mobile || !password) {
             return res.json({ success: false, message: "All fields are required" });
         }
 
@@ -87,15 +94,19 @@ export const signupUser = async (req, res) => {
         }
 
         const normalizedEmail = email.trim().toLowerCase();
-        const existingUser = await User.findOne({ email: normalizedEmail });
+        const normalizedMobile = mobile.trim();
+        const existingUser = await User.findOne({
+            $or: [{ email: normalizedEmail }, { mobile: normalizedMobile }]
+        });
 
         if (existingUser) {
-            return res.json({ success: false, message: "User already exists" });
+            return res.json({ success: false, message: "User already exists with this email or mobile number" });
         }
 
         const user = await User.create({
             name: name.trim(),
             email: normalizedEmail,
+            mobile: normalizedMobile,
             password: hashPassword(password)
         });
 
@@ -244,6 +255,51 @@ export const resetForgottenPassword = async (req, res) => {
         await user.save();
 
         res.json({ success: true, message: "Password reset successfully" });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export const toggleFollowWriter = async (req, res) => {
+    try {
+        const { writerId } = req.body;
+
+        if (!writerId) {
+            return res.json({ success: false, message: 'Writer is required' });
+        }
+
+        const [user, writer] = await Promise.all([
+            User.findById(req.user.userId),
+            Writer.findById(writerId)
+        ]);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        if (!writer) {
+            return res.json({ success: false, message: 'Writer not found' });
+        }
+
+        const writerIdString = writer._id.toString();
+        const isFollowing = user.followingWriters.some((followedWriterId) => followedWriterId.toString() === writerIdString);
+
+        user.followingWriters = isFollowing
+            ? user.followingWriters.filter((followedWriterId) => followedWriterId.toString() !== writerIdString)
+            : [...user.followingWriters, writer._id];
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: isFollowing ? 'Writer unfollowed successfully' : 'Writer followed successfully',
+            user: {
+                followingWriters: user.followingWriters,
+                savedBlogs: user.savedBlogs,
+                likedBlogs: user.likedBlogs,
+                dislikedBlogs: user.dislikedBlogs
+            }
+        });
     } catch (error) {
         res.json({ success: false, message: error.message });
     }

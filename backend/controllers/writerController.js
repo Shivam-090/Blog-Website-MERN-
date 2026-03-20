@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import Blog from '../models/Blog.js';
 import Comment from '../models/Comment.js';
 import Writer from '../models/Writer.js';
+import User from '../models/User.js';
 
 const hashPassword = (password) => {
     const salt = crypto.randomBytes(16).toString('hex');
@@ -17,23 +18,25 @@ const verifyPassword = (password, storedPassword) => {
 };
 
 const createWriterToken = (writer) => jwt.sign(
-    { writerId: writer._id, name: writer.name, email: writer.email, phone: writer.phone, role: 'writer' },
+    { writerId: writer._id, name: writer.name, username: writer.username, email: writer.email, phone: writer.phone, role: 'writer' },
     process.env.JWT_SECRET
 );
 
 const sanitizeWriter = (writer) => ({
     _id: writer._id,
     name: writer.name,
+    username: writer.username,
     email: writer.email,
     phone: writer.phone,
+    description: writer.description,
     createdAt: writer.createdAt
 });
 
 export const registerWriter = async (req, res) => {
     try {
-        const { name, email, phone, password } = req.body;
+        const { name, username, email, phone, description, password } = req.body;
 
-        if (!name || !email || !phone || !password) {
+        if (!name || !username || !email || !phone || !description || !password) {
             return res.json({ success: false, message: "All fields are required" });
         }
 
@@ -43,19 +46,22 @@ export const registerWriter = async (req, res) => {
 
         const normalizedEmail = email.trim().toLowerCase();
         const normalizedPhone = phone.trim();
+        const normalizedUsername = username.trim().toLowerCase();
 
         const existingWriter = await Writer.findOne({
-            $or: [{ email: normalizedEmail }, { phone: normalizedPhone }]
+            $or: [{ email: normalizedEmail }, { phone: normalizedPhone }, { username: normalizedUsername }]
         });
 
         if (existingWriter) {
-            return res.json({ success: false, message: "Writer already exists with this email or phone" });
+            return res.json({ success: false, message: "Writer already exists with this email, phone, or username" });
         }
 
         const writer = await Writer.create({
             name: name.trim(),
+            username: normalizedUsername,
             email: normalizedEmail,
             phone: normalizedPhone,
+            description: description.trim(),
             password: hashPassword(password)
         });
 
@@ -77,14 +83,15 @@ export const loginWriter = async (req, res) => {
         const { login, password } = req.body;
 
         if (!login || !password) {
-            return res.json({ success: false, message: "Email or phone and password are required" });
+            return res.json({ success: false, message: "Email, phone, or username and password are required" });
         }
 
         const normalizedLogin = login.trim().toLowerCase();
         const writer = await Writer.findOne({
             $or: [
                 { email: normalizedLogin },
-                { phone: login.trim() }
+                { phone: login.trim() },
+                { username: normalizedLogin }
             ]
         });
 
@@ -255,6 +262,117 @@ export const getWriterDashboard = async (req, res) => {
                 drafts,
                 recentBlogs
             }
+        });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export const getPublicWriterProfile = async (req, res) => {
+    try {
+        const { username, writerId } = req.params;
+
+        const writer = username
+            ? await Writer.findOne({ username: username.trim().toLowerCase() }).select('-password')
+            : await Writer.findById(writerId).select('-password');
+
+        if (!writer) {
+            return res.status(404).json({ success: false, message: 'Writer not found' });
+        }
+
+        const writerBlogs = await Blog.find({ writer: writer._id, isPublished: true }).sort({ createdAt: -1 }).lean();
+        const writerBlogIds = writerBlogs.map((blog) => blog._id);
+
+        const [commentsCount, followersCount, commentGroups] = await Promise.all([
+            Comment.countDocuments({ blog: { $in: writerBlogIds }, isApproved: true }),
+            User.countDocuments({ followingWriters: writer._id }),
+            Comment.aggregate([
+                { $match: { blog: { $in: writerBlogIds }, isApproved: true } },
+                { $group: { _id: '$blog', count: { $sum: 1 } } }
+            ])
+        ]);
+
+        const commentCountMap = commentGroups.reduce((acc, item) => {
+            acc[item._id.toString()] = item.count;
+            return acc;
+        }, {});
+
+        const readsCount = writerBlogs.reduce((total, blog) => total + (blog.viewsCount || 0), 0);
+        const likesCount = writerBlogs.reduce((total, blog) => total + (blog.likesCount || 0), 0);
+
+        res.json({
+            success: true,
+            profile: {
+                writer: sanitizeWriter(writer),
+                stats: {
+                    followers: followersCount,
+                    blogs: writerBlogs.length,
+                    reads: readsCount,
+                    likes: likesCount,
+                    comments: commentsCount
+                },
+                blogs: writerBlogs.map((blog) => ({
+                    ...blog,
+                    commentsCount: commentCountMap[blog._id.toString()] || 0
+                }))
+            }
+        });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export const getPublicWriterDirectory = async (req, res) => {
+    try {
+        const search = req.query.q?.trim();
+        const query = search
+            ? {
+                $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { username: { $regex: search.toLowerCase(), $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } }
+                ]
+            }
+            : {};
+
+        const writers = await Writer.find(query).select('-password').sort({ createdAt: -1 }).lean();
+
+        const writerIds = writers.map((writer) => writer._id);
+        const blogs = await Blog.find({ writer: { $in: writerIds }, isPublished: true }).lean();
+
+        const blogStats = blogs.reduce((acc, blog) => {
+            const writerId = blog.writer?.toString();
+
+            if (!acc[writerId]) {
+                acc[writerId] = { blogs: 0, reads: 0 };
+            }
+
+            acc[writerId].blogs += 1;
+            acc[writerId].reads += blog.viewsCount || 0;
+            return acc;
+        }, {});
+
+        const followerCounts = await User.aggregate([
+            { $match: { followingWriters: { $exists: true, $ne: [] } } },
+            { $unwind: '$followingWriters' },
+            { $group: { _id: '$followingWriters', count: { $sum: 1 } } }
+        ]);
+
+        const followerMap = followerCounts.reduce((acc, item) => {
+            acc[item._id.toString()] = item.count;
+            return acc;
+        }, {});
+
+        res.json({
+            success: true,
+            writers: writers.map((writer) => ({
+                ...sanitizeWriter(writer),
+                stats: {
+                    followers: followerMap[writer._id.toString()] || 0,
+                    blogs: blogStats[writer._id.toString()]?.blogs || 0,
+                    reads: blogStats[writer._id.toString()]?.reads || 0
+                }
+            }))
         });
     } catch (error) {
         res.json({ success: false, message: error.message });

@@ -6,7 +6,9 @@ import {
     getWriterBlogs,
     getWriterComments,
     getWriterDashboard,
+    getPublicWriterDirectory,
     getWriterProfile,
+    getPublicWriterProfile,
     loginWriter,
     registerWriter,
     resetWriterPassword,
@@ -20,6 +22,9 @@ writerRouter.post('/register', registerWriter);
 writerRouter.post('/login', loginWriter);
 writerRouter.post('/verify-reset', verifyWriterResetIdentity);
 writerRouter.post('/reset-password', resetWriterPassword);
+writerRouter.get('/public', getPublicWriterDirectory);
+writerRouter.get('/public/:username', getPublicWriterProfile);
+writerRouter.get('/public/id/:writerId', getPublicWriterProfile);
 writerRouter.get('/profile', auth, getWriterProfile);
 writerRouter.post('/update-password', auth, updateWriterPassword);
 writerRouter.get('/comments', auth, getWriterComments);

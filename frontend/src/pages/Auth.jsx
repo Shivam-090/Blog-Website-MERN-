@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { KeyRound, Mail, MessageSquareText, Phone, UserRound } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import { useAppContext } from '../context/useAppContext'
 
 const Auth = () => {
@@ -14,6 +13,7 @@ const Auth = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    mobile: '',
     password: '',
     resetEmail: '',
     newPassword: ''
@@ -32,14 +32,24 @@ const Auth = () => {
     setFormData((current) => ({ ...current, [name]: value }))
   }
 
+  const switchMode = (nextMode) => {
+    setMode(nextMode)
+    setResetStep(1)
+  }
+
   const handleAuthSubmit = async (event) => {
     event.preventDefault()
     setIsSubmitting(true)
 
     try {
       if (mode === 'signup') {
-        await signupUser(formData)
-        toast.success('Your account is ready')
+        await signupUser({
+          name: formData.name,
+          email: formData.email,
+          mobile: formData.mobile,
+          password: formData.password
+        })
+        toast.success('Your reader account is ready')
       } else {
         await loginUser({ email: formData.email, password: formData.password })
         toast.success('Welcome back')
@@ -93,215 +103,276 @@ const Auth = () => {
     }
   }
 
-  const switchMode = (nextMode) => {
-    setMode(nextMode)
-    setResetStep(1)
-  }
-
-  const renderForm = () => {
-    if (mode === 'forgot') {
-      if (resetStep === 1) {
-        return (
-          <form onSubmit={handleVerifyEmail} className='mt-8 space-y-5'>
-            <div>
-              <label htmlFor='resetEmail' className='mb-2 block text-sm font-medium text-slate-700'>Email</label>
-              <input
-                id='resetEmail'
-                name='resetEmail'
-                type='email'
-                value={formData.resetEmail}
-                onChange={updateField}
-                placeholder='you@example.com'
-                required
-                className='w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-primary'
-              />
-            </div>
-
-            <button
-              type='submit'
-              disabled={isSubmitting}
-              className='w-full rounded-2xl bg-slate-900 px-4 py-3 font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60'
-            >
-              {isSubmitting ? 'Checking...' : 'Verify email'}
-            </button>
-          </form>
-        )
-      }
-
-      return (
-        <form onSubmit={handleResetPassword} className='mt-8 space-y-5'>
-          <div className='rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700'>
-            Email verified for <span className='font-medium'>{formData.resetEmail}</span>
-          </div>
-          <div>
-            <label htmlFor='newPassword' className='mb-2 block text-sm font-medium text-slate-700'>New password</label>
-            <input
-              id='newPassword'
-              name='newPassword'
-              type='password'
-              value={formData.newPassword}
-              onChange={updateField}
-              placeholder='At least 6 characters'
-              required
-              className='w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-primary'
-            />
-          </div>
-
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className='w-full rounded-2xl bg-slate-900 px-4 py-3 font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60'
-          >
-            {isSubmitting ? 'Updating...' : 'Update password'}
-          </button>
-        </form>
-      )
-    }
-
-    return (
-      <form onSubmit={handleAuthSubmit} className='mt-8 space-y-5'>
-        {mode === 'signup' && (
-          <div>
-            <label htmlFor='name' className='mb-2 block text-sm font-medium text-slate-700'>Full name</label>
-            <input
-              id='name'
-              name='name'
-              type='text'
-              value={formData.name}
-              onChange={updateField}
-              placeholder='Your name'
-              required
-              className='w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-primary'
-            />
-          </div>
-        )}
-
-        <div>
-          <label htmlFor='email' className='mb-2 block text-sm font-medium text-slate-700'>Email</label>
-          <input
-            id='email'
-            name='email'
-            type='email'
-            value={formData.email}
-            onChange={updateField}
-            placeholder='you@example.com'
-            required
-            className='w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-primary'
-          />
-        </div>
-
-        <div>
-          <label htmlFor='password' className='mb-2 block text-sm font-medium text-slate-700'>Password</label>
-          <input
-            id='password'
-            name='password'
-            type='password'
-            value={formData.password}
-            onChange={updateField}
-            placeholder='At least 6 characters'
-            required
-            className='w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-primary'
-          />
-        </div>
-
-        {mode === 'login' && (
-          <button
-            type='button'
-            onClick={() => switchMode('forgot')}
-            className='text-sm font-medium text-primary cursor-pointer'
-          >
-            Forgot password?
-          </button>
-        )}
-
-        <button
-          type='submit'
-          disabled={isSubmitting}
-          className='w-full rounded-2xl bg-slate-900 px-4 py-3 font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60'
-        >
-          {isSubmitting ? 'Please wait...' : mode === 'signup' ? 'Create account' : 'Login'}
-        </button>
-      </form>
-    )
-  }
-
   return (
-    <div className='min-h-screen bg-[radial-gradient(circle_at_top,#dbeafe,transparent_35%),linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)]'>
-      <Navbar />
+    <div className="ethereal-shell flex min-h-screen items-center justify-center overflow-x-hidden bg-[#f6f6ff] px-4 py-10 sm:px-6 lg:px-10">
+      <div className="ethereal-orb ethereal-orb-primary" />
+      <div className="ethereal-orb ethereal-orb-secondary" />
 
-      <div className='mx-6 mt-10 mb-20 grid gap-8 lg:mx-20 lg:grid-cols-[1.1fr_0.9fr] xl:mx-32'>
-        <div className='rounded-[32px] border border-white/60 bg-white/80 p-8 shadow-[0_24px_80px_rgba(80,68,229,0.12)] backdrop-blur-sm sm:p-12'>
-          <p className='inline-flex rounded-full border border-primary/20 bg-primary/8 px-4 py-1 text-sm text-primary'>Read freely. Join to interact.</p>
-          <h1 className='mt-6 max-w-xl text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl'>
-            Login or create an account to save posts, react, and join the conversation.
-          </h1>
-          <p className='mt-5 max-w-lg text-base text-slate-600'>
-            Blogs stay public for everyone. Your account unlocks bookmarks, likes, dislikes, commenting, and your personal activity hub.
-          </p>
-          <div className='mt-10 grid gap-4 sm:grid-cols-3'>
-            <div className='rounded-2xl border border-slate-200 bg-slate-50 p-4'>
-              <p className='text-sm font-medium text-slate-900'>Save blogs</p>
-              <p className='mt-2 text-sm text-slate-600'>Build your own reading list and come back anytime.</p>
+      {mode === 'forgot' ? (
+        <div className="relative z-10 w-full max-w-[1040px] overflow-hidden rounded-[30px] bg-white shadow-[0_30px_80px_rgba(39,46,66,0.12)]">
+          <div className="grid min-h-[560px] lg:grid-cols-2">
+            <div className="flex items-center justify-center px-8 py-12 sm:px-14">
+                <div className="w-full max-w-[340px]">
+                  <div className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.24em] text-[#702ae1]">
+                    <KeyRound className="h-4 w-4" />
+                    Password reset
+                  </div>
+                  <h1 className="mt-4 font-[Manrope] text-4xl font-extrabold tracking-[-0.05em] text-slate-900">
+                    Get back to your reading list.
+                  </h1>
+                <p className="mt-4 text-sm leading-7 text-slate-500">
+                  {resetStep === 1
+                    ? 'Enter the email linked to your reader account.'
+                    : `Email verified for ${formData.resetEmail}. Choose a new password.`}
+                </p>
+
+                  {resetStep === 1 ? (
+                    <form onSubmit={handleVerifyEmail} className="mt-8 space-y-4">
+                      <div className="relative">
+                        <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <input
+                          name="resetEmail"
+                          type="email"
+                          value={formData.resetEmail}
+                          onChange={updateField}
+                          placeholder="Enter E-Mail"
+                          required
+                          className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                      className="w-full rounded-xl bg-[linear-gradient(135deg,#702ae1,#b28cff)] px-4 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white shadow-[0_16px_34px_rgba(112,42,225,0.24)] transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isSubmitting ? 'Checking...' : 'Verify Email'}
+                    </button>
+                  </form>
+                  ) : (
+                    <form onSubmit={handleResetPassword} className="mt-8 space-y-4">
+                      <div className="relative">
+                        <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <input
+                          name="newPassword"
+                          type="password"
+                          value={formData.newPassword}
+                          onChange={updateField}
+                          placeholder="Enter New Password"
+                          required
+                          className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                      className="w-full rounded-xl bg-[linear-gradient(135deg,#702ae1,#b28cff)] px-4 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white shadow-[0_16px_34px_rgba(112,42,225,0.24)] transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isSubmitting ? 'Updating...' : 'Update Password'}
+                    </button>
+                  </form>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => switchMode('login')}
+                  className="mt-6 text-sm font-semibold text-[#702ae1] transition hover:text-[#5521b0]"
+                >
+                  Back to Sign In
+                </button>
+              </div>
             </div>
-            <div className='rounded-2xl border border-slate-200 bg-slate-50 p-4'>
-              <p className='text-sm font-medium text-slate-900'>Track activity</p>
-              <p className='mt-2 text-sm text-slate-600'>See every liked post, saved blog, and comment from your profile.</p>
-            </div>
-            <div className='rounded-2xl border border-slate-200 bg-slate-50 p-4'>
-              <p className='text-sm font-medium text-slate-900'>Recover access</p>
-              <p className='mt-2 text-sm text-slate-600'>Use forgot password to reset your account if you get locked out.</p>
+
+            <div className="flex items-center justify-center bg-[linear-gradient(135deg,#702ae1,#57d2d0)] px-8 py-12 text-white sm:px-14">
+              <div className="max-w-[320px] text-center">
+                <h2 className="font-[Manrope] text-4xl font-extrabold leading-tight tracking-[-0.05em]">
+                  Continue the conversation
+                </h2>
+                <p className="mt-5 text-base leading-8 text-white/85">
+                  Recover your account and return to saved blogs, reactions, and comments without losing your place.
+                </p>
+              </div>
             </div>
           </div>
         </div>
+      ) : (
+        <div className="relative z-10 w-full max-w-[1040px] overflow-hidden rounded-[30px] bg-white shadow-[0_30px_80px_rgba(39,46,66,0.12)]">
+          <div className="relative grid min-h-[620px] lg:grid-cols-2">
+            <div className={`flex items-center justify-center px-8 py-12 sm:px-14 ${mode === 'login' ? 'lg:col-start-1' : 'lg:col-start-2'}`}>
+              {mode === 'login' ? (
+                <form onSubmit={handleAuthSubmit} className="mx-auto flex w-full max-w-[340px] flex-col items-center">
+                  <div className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.24em] text-[#702ae1]">
+                    <MessageSquareText className="h-4 w-4" />
+                    Reader login
+                  </div>
+                  <h1 className="mt-4 text-center font-[Manrope] text-5xl font-extrabold tracking-[-0.05em] text-slate-900">
+                    Sign In
+                  </h1>
+                  <p className="mt-5 text-center text-sm text-slate-500">Sign in to save blogs and join discussions.</p>
 
-        <div className='rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-10'>
-          {mode !== 'forgot' && (
-            <div className='inline-flex rounded-full bg-slate-100 p-1 text-sm'>
-              <button
-                type='button'
-                onClick={() => switchMode('login')}
-                className={`rounded-full px-5 py-2 transition ${mode === 'login' ? 'bg-primary text-white' : 'text-slate-600'}`}
-              >
-                Login
-              </button>
-              <button
-                type='button'
-                onClick={() => switchMode('signup')}
-                className={`rounded-full px-5 py-2 transition ${mode === 'signup' ? 'bg-primary text-white' : 'text-slate-600'}`}
-              >
-                Signup
-              </button>
+                  <div className="mt-6 w-full space-y-3">
+                    <div className="relative">
+                      <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={updateField}
+                        placeholder="Enter E-Mail"
+                        required
+                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                      />
+                    </div>
+                    <div className="relative">
+                      <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={updateField}
+                        placeholder="Enter Password"
+                        required
+                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => switchMode('forgot')}
+                    className="mt-4 self-end text-sm text-slate-500 transition hover:text-[#702ae1]"
+                  >
+                    Forgot Password
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-7 w-full max-w-[230px] rounded-xl bg-[linear-gradient(135deg,#702ae1,#b28cff)] px-4 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white shadow-[0_16px_34px_rgba(112,42,225,0.24)] transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isSubmitting ? 'Please wait...' : 'Sign In'}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleAuthSubmit} className="mx-auto flex w-full max-w-[340px] flex-col items-center">
+                  <div className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.24em] text-[#702ae1]">
+                    <UserRound className="h-4 w-4" />
+                    Create account
+                  </div>
+                  <h1 className="mt-4 text-center font-[Manrope] text-5xl font-extrabold tracking-[-0.05em] text-slate-900">
+                    Sign Up
+                  </h1>
+                  <p className="mt-5 text-center text-sm text-slate-500">
+                    Create your blog reader profile and keep your library in sync.
+                  </p>
+
+                  <div className="mt-6 w-full space-y-3">
+                    <div className="relative">
+                      <UserRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        name="name"
+                        type="text"
+                        value={formData.name}
+                        onChange={updateField}
+                        placeholder="Enter Full Name"
+                        required
+                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        name="mobile"
+                        type="text"
+                        value={formData.mobile}
+                        onChange={updateField}
+                        placeholder="Enter Mobile Number"
+                        required
+                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={updateField}
+                        placeholder="Enter E-Mail"
+                        required
+                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                      />
+                    </div>
+                    <div className="relative">
+                      <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={updateField}
+                        placeholder="Create Password"
+                        required
+                        className="w-full rounded-xl bg-[#f3f1ff] py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:shadow-[0_0_0_3px_rgba(112,42,225,0.14)]"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-7 w-full max-w-[230px] rounded-xl bg-[linear-gradient(135deg,#702ae1,#b28cff)] px-4 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white shadow-[0_16px_34px_rgba(112,42,225,0.24)] transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isSubmitting ? 'Please wait...' : 'Sign Up'}
+                  </button>
+                </form>
+              )}
             </div>
-          )}
 
-          <div className='mt-8'>
-            <h2 className='text-2xl font-semibold text-slate-900'>
-              {mode === 'signup' ? 'Create your account' : mode === 'forgot' ? 'Reset your password' : 'Welcome back'}
-            </h2>
-            <p className='mt-2 text-sm text-slate-500'>
-              {mode === 'signup'
-                ? 'Start interacting with blogs in a few seconds.'
-                : mode === 'forgot'
-                  ? 'First enter your email, then choose a new password.'
-                  : 'Login to continue where you left off.'}
-            </p>
-          </div>
-
-          {renderForm()}
-
-          {mode === 'forgot' && (
-            <button
-              type='button'
-              onClick={() => switchMode('login')}
-              className='mt-5 text-sm font-medium text-primary cursor-pointer'
+            <div
+              className={`hidden lg:flex lg:absolute lg:top-0 lg:h-full lg:w-1/2 lg:items-center lg:justify-center lg:rounded-[30px] lg:bg-[linear-gradient(135deg,#702ae1,#57d2d0)] lg:px-10 lg:py-12 lg:text-white lg:transition-transform lg:duration-700 ${
+                mode === 'signup' ? 'lg:translate-x-0' : 'lg:translate-x-full'
+              }`}
             >
-              Back to login
-            </button>
-          )}
-        </div>
-      </div>
+              <div className="max-w-[330px] text-center">
+                <h2 className="font-[Manrope] text-5xl font-extrabold leading-tight tracking-[-0.05em]">
+                  {mode === 'login' ? 'Build Your Reading Space' : 'Welcome Back to Your Blogs'}
+                </h2>
+                <p className="mt-6 text-base leading-8 text-white/85">
+                  {mode === 'login'
+                    ? 'Create an account to bookmark blog posts, react to stories, and keep up with every conversation.'
+                    : 'Sign in to return to your saved blogs, comments, and reading activity.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+                  className="mt-8 rounded-xl border border-white/70 px-10 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition hover:bg-white/10"
+                >
+                  {mode === 'login' ? 'Sign Up' : 'Sign In'}
+                </button>
+              </div>
+            </div>
 
-      <Footer />
+            <div className="border-t border-slate-100 px-8 py-8 lg:hidden">
+              <div className="rounded-[24px] bg-[linear-gradient(135deg,#702ae1,#57d2d0)] px-6 py-8 text-center text-white">
+                <h2 className="font-[Manrope] text-3xl font-extrabold tracking-[-0.05em]">
+                  {mode === 'login' ? 'Need an account?' : 'Already registered?'}
+                </h2>
+                <p className="mt-4 text-sm leading-7 text-white/85">
+                  {mode === 'login'
+                    ? 'Create your reader profile and start saving the blog posts you love.'
+                    : 'Sign back in to continue reading and interacting with blog content.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+                  className="mt-6 rounded-xl border border-white/70 px-8 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white"
+                >
+                  {mode === 'login' ? 'Sign Up' : 'Sign In'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -87,33 +87,36 @@ const WriterAddBlog = () => {
   },[])
 
   return (
-    <form onSubmit={onSubmitHandler} className='flex bg-blue-50/50 text-gray-600 h-[950px] w-[100vw] overflow-scroll'>
-      <div className='bg-white w-full max-w-3xl p-4 md:p-10 sm:m-10 shadow rounded'>
-        <p>Upload thumbnail</p>
+    <form onSubmit={onSubmitHandler} className='flex h-[950px] w-[100vw] overflow-scroll bg-[#f6f6ff] text-slate-600'>
+      <div className='m-4 w-full max-w-3xl rounded-[2rem] bg-white/85 p-4 shadow-[0_20px_50px_rgba(39,46,66,0.06)] sm:m-10 md:p-10'>
+        <p className='text-xs font-bold uppercase tracking-[0.22em] text-[#8d88b5]'>Create story</p>
+        <h1 className='mt-3 font-[Manrope] text-3xl font-extrabold tracking-[-0.04em] text-slate-900'>Add a new blog</h1>
+
+        <p className='mt-8 text-sm font-semibold text-slate-700'>Upload thumbnail</p>
         <label htmlFor="image">
-          <img src={!image ? assets.upload_area : URL.createObjectURL(image)} alt="" className='mt-2 h-16 rounded cursor-pointer' />
+          <img src={!image ? assets.upload_area : URL.createObjectURL(image)} alt="" className='mt-3 h-16 rounded-2xl cursor-pointer' />
           <input onChange={(e)=> setImage(e.target.files[0])} type="file" id='image' required hidden/>
         </label>
-        <p className='mt-4'>Blog title</p>
-        <input type="text" placeholder='Type here' required className='w-full max-w-lg mt-2 p-2 border border-gray-300 outline-none rounded' onChange={(e)=>setTitle(e.target.value)} value={title}/>
-        <p className='mt-4'>Sub title</p>
-        <input type="text" placeholder='Type here' required className='w-full max-w-lg mt-2 p-2 border border-gray-300 outline-none rounded' onChange={(e)=>setSubTitle(e.target.value)} value={subTitle}/>
-        <p className='mt-4'>Blog Description</p>
+        <p className='mt-5 text-sm font-semibold text-slate-700'>Blog title</p>
+        <input type="text" placeholder='Type here' required className='mt-2 w-full max-w-lg rounded-2xl border border-[#dddff2] bg-[#f7f8ff] p-3 outline-none transition focus:border-[#b28cff]' onChange={(e)=>setTitle(e.target.value)} value={title}/>
+        <p className='mt-5 text-sm font-semibold text-slate-700'>Sub title</p>
+        <input type="text" placeholder='Type here' required className='mt-2 w-full max-w-lg rounded-2xl border border-[#dddff2] bg-[#f7f8ff] p-3 outline-none transition focus:border-[#b28cff]' onChange={(e)=>setSubTitle(e.target.value)} value={subTitle}/>
+        <p className='mt-5 text-sm font-semibold text-slate-700'>Blog Description</p>
         <div className='max-w-lg h-74 pb-16 sm:pb-10 pt-2 relative'>
           <div ref={editorRef}></div>
-          <button disabled={loading} className='absolute bottom-1 right-2 ml-2 text-xs text-white bg-black/70 px-4 py-1.5 rounded hover:underline cursor-pointer' type='button' onClick={generateContent} >Generate with AI</button>
+          <button disabled={loading} className='absolute bottom-1 right-2 ml-2 cursor-pointer rounded-full bg-[linear-gradient(135deg,#702ae1,#b28cff)] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_16px_30px_rgba(112,42,225,0.18)]' type='button' onClick={generateContent} >Generate with AI</button>
         </div>
-        <p className='mt-4'>Blog category</p>
-        <select onChange={(e)=> setCategory(e.target.value)} name="category" value={category} className='mt-2 px-3 py-2 border text-gray-500 border-gray-300 outline-none rounded'>
+        <p className='mt-5 text-sm font-semibold text-slate-700'>Blog category</p>
+        <select onChange={(e)=> setCategory(e.target.value)} name="category" value={category} className='mt-2 rounded-2xl border border-[#dddff2] bg-[#f7f8ff] px-3 py-3 text-sm text-slate-600 outline-none'>
           <option value="">Select category</option>
           {blogCategories.map((item, index)=> <option key={index} value={item}>{item}</option>)}
         </select>
-        <div className='flex gap-2 mt-4'>
-          <p>Publish Now</p>
+        <div className='mt-5 flex gap-2'>
+          <p className='text-sm font-semibold text-slate-700'>Publish Now</p>
           <input type="checkbox" checked={isPublished} className='scale-125 cursor-pointer' onChange={(e)=> setIsPublished(e.target.checked)}/>
         </div>
         <div>
-          <button disabled={isAdding} type='submit' className='mt-8 w-40 h-10 bg-primary text-white rounded cursor-pointer text-sm'>{isAdding ? 'Adding...': 'Add Blog'}</button>
+          <button disabled={isAdding} type='submit' className='mt-8 h-11 w-40 cursor-pointer rounded-full bg-[linear-gradient(135deg,#702ae1,#b28cff)] text-sm font-bold text-white shadow-[0_18px_34px_rgba(112,42,225,0.2)]'>{isAdding ? 'Adding...': 'Add Blog'}</button>
         </div>
       </div>
     </form>

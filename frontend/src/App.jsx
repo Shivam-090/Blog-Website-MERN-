@@ -4,6 +4,9 @@ import Home from "./pages/Home.jsx"
 import Blog from "./pages/Blog.jsx"
 import Auth from "./pages/Auth.jsx"
 import Profile from "./pages/Profile.jsx"
+import Following from "./pages/Following.jsx"
+import Writers from "./pages/Writers.jsx"
+import WriterDetails from "./pages/WriterDetails.jsx"
 import WriterLayout from "./pages/writer/WriterLayout.jsx"
 import WriterDashboard from "./pages/writer/WriterDashboard.jsx"
 import WriterAddBlog from "./pages/writer/WriterAddBlog.jsx"
@@ -30,6 +33,10 @@ function App() {
         <Route path="/blog/:id" element={<Blog />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/following" element={<Following />} />
+        <Route path="/writers" element={<Writers />} />
+        <Route path="/writers/:username" element={<WriterDetails />} />
+        <Route path="/writers/id/:writerId" element={<WriterDetails />} />
         <Route path='/writer' element={writerToken ? <WriterLayout />: <WriterAuth/>}> 
         <Route index element={<WriterDashboard/>}/>
         <Route path='profile' element={<WriterProfile/>}/>

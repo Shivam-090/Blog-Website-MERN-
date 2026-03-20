@@ -5,6 +5,7 @@ import {
     loginUser,
     resetForgottenPassword,
     signupUser,
+    toggleFollowWriter,
     updateUserPassword,
     verifyResetEmail
 } from '../controllers/userController.js';
@@ -19,5 +20,6 @@ userRouter.post('/reset-password', resetForgottenPassword);
 userRouter.get('/me', userAuth, getCurrentUser);
 userRouter.get('/profile', userAuth, getUserProfile);
 userRouter.post('/update-password', userAuth, updateUserPassword);
+userRouter.post('/follow-writer', userAuth, toggleFollowWriter);
 
 export default userRouter;

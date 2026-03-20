@@ -26,7 +26,8 @@ const mergeUserPayload = (currentUser, payload) => {
     ...payload,
     savedBlogs: payload.savedBlogs || currentUser?.savedBlogs || [],
     likedBlogs: payload.likedBlogs || currentUser?.likedBlogs || [],
-    dislikedBlogs: payload.dislikedBlogs || currentUser?.dislikedBlogs || []
+    dislikedBlogs: payload.dislikedBlogs || currentUser?.dislikedBlogs || [],
+    followingWriters: payload.followingWriters || currentUser?.followingWriters || []
   };
 };
 
@@ -179,6 +180,17 @@ export const AppProvider = ({children})=>{
     return syncBlogFromResponse(data.blog);
   };
 
+  const toggleFollowWriter = async (writerId) => {
+    const { data } = await userAxios.post('/api/user/follow-writer', { writerId })
+
+    if (!data.success) {
+      throw new Error(data.message)
+    }
+
+    syncUserInteractions(data.user)
+    return data.user
+  }
+
   const incrementShare = async (blogId) => {
     const { data } = await api.post('/api/blog/engagement/share', { blogId });
 
@@ -306,6 +318,7 @@ export const AppProvider = ({children})=>{
   }, [])
 
   const bookmarkedBlogIds = user?.savedBlogs?.map((blogId) => blogId.toString()) || []
+  const followingWriterIds = user?.followingWriters?.map((writerId) => writerId.toString()) || []
   const blogReactions = blogs.reduce((acc, blog) => {
     const blogId = blog._id?.toString()
 
@@ -351,10 +364,12 @@ export const AppProvider = ({children})=>{
     input,
     setInput,
     bookmarkedBlogIds,
+    followingWriterIds,
     blogReactions,
     updateBlogInState,
     toggleReaction,
     toggleBookmark,
+    toggleFollowWriter,
     incrementShare
   }
 

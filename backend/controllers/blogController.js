@@ -75,6 +75,7 @@ export const addBlog = async (req, res) => {
         await Blog.create({
             writer: req.writer?.writerId,
             writerName: req.writer?.name,
+            writerUsername: req.writer?.username,
             title,
             subTitle,
             description,
@@ -94,7 +95,7 @@ export const addBlog = async (req, res) => {
 
 export const getAllBlogs = async (req, res) => {
     try {
-        const blogs = await Blog.find({ isPublished: true }).sort({ createdAt: -1 }).lean();
+        const blogs = await Blog.find({ isPublished: true }).populate('writer', 'username description').sort({ createdAt: -1 }).lean();
         const blogsWithCounts = await attachCommentCounts(blogs);
         res.json({ success: true, blogs: blogsWithCounts });
     } catch (error) {
@@ -106,10 +107,12 @@ export const getAllBlogs = async (req, res) => {
 export const getBlogById = async (req, res) => {
     try {
         const { blogId } = req.params;
-        const blog = await Blog.findById(blogId);
+        const blog = await Blog.findById(blogId).populate('writer', 'name username description');
         if (!blog) {
             return res.json({ success: false, message: "Blog not found" });
         }
+        blog.viewsCount = (blog.viewsCount || 0) + 1;
+        await blog.save();
         const blogWithCounts = await buildBlogResponse(blog);
         res.json({ success: true, blog: blogWithCounts });
     } catch (error) {

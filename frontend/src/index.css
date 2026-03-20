@@ -1,16 +1,82 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap');
 @import "tailwindcss";
 
 *{
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
 }
 
 ::-webkit-scrollbar {
   display: none;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top right, rgba(112, 42, 225, 0.12), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(0, 103, 94, 0.10), transparent 24%),
+    #f6f6ff;
+  color: #272e42;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
 @theme {
   --color-primary: #5044e5;
+}
+
+.ethereal-shell {
+  position: relative;
+  background: #f6f6ff;
+}
+
+.ethereal-orb {
+  pointer-events: none;
+  position: fixed;
+  z-index: 0;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.65;
+}
+
+.ethereal-orb-primary {
+  top: -140px;
+  right: -120px;
+  width: 420px;
+  height: 420px;
+  background: rgba(112, 42, 225, 0.16);
+}
+
+.ethereal-orb-secondary {
+  bottom: -160px;
+  left: -140px;
+  width: 380px;
+  height: 380px;
+  background: rgba(0, 103, 94, 0.14);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.ethereal-nav-link {
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.ethereal-nav-link:hover {
+  color: #702ae1;
+  transform: translateY(-1px);
 }
 
 .rich-text{

@@ -28,41 +28,46 @@ const WriterDashboard = () => {
   }, [fetchDashboard])
 
   return (
-    <div className='flex-1 p-4 md:p-10 bg-blue-50/50'>
+    <div className='flex-1 bg-[#f6f6ff] p-4 md:p-10'>
+      <div className='mb-8'>
+        <p className='text-xs font-bold uppercase tracking-[0.22em] text-[#8d88b5]'>Overview</p>
+        <h1 className='mt-3 font-[Manrope] text-3xl font-extrabold tracking-[-0.04em] text-slate-900'>Writer dashboard</h1>
+      </div>
+
       <div className='flex flex-wrap gap-4'>
-        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:scale-105 transition-all'>
+        <div className='min-w-58 flex cursor-pointer items-center gap-4 rounded-[1.5rem] bg-white/85 p-5 shadow-[0_18px_40px_rgba(39,46,66,0.05)] transition hover:-translate-y-1'>
           <img src={assets.dashboard_icon_1} alt="" />
           <div>
-            <p className='text-xl font-semibold text-gray-600'>{dashboardData.blogs}</p>
-            <p className='text-gray-400 font-light'>Your blogs</p>
+            <p className='text-2xl font-extrabold text-slate-900'>{dashboardData.blogs}</p>
+            <p className='text-sm font-medium text-slate-500'>Your blogs</p>
           </div>
         </div>
 
-        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:scale-105 transition-all'>
+        <div className='min-w-58 flex cursor-pointer items-center gap-4 rounded-[1.5rem] bg-white/85 p-5 shadow-[0_18px_40px_rgba(39,46,66,0.05)] transition hover:-translate-y-1'>
           <img src={assets.dashboard_icon_2} alt="" />
           <div>
-            <p className='text-xl font-semibold text-gray-600'>{dashboardData.comments}</p>
-            <p className='text-gray-400 font-light'>Comments on your blogs</p>
+            <p className='text-2xl font-extrabold text-slate-900'>{dashboardData.comments}</p>
+            <p className='text-sm font-medium text-slate-500'>Comments on your blogs</p>
           </div>
         </div>
 
-        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:scale-105 transition-all'>
+        <div className='min-w-58 flex cursor-pointer items-center gap-4 rounded-[1.5rem] bg-white/85 p-5 shadow-[0_18px_40px_rgba(39,46,66,0.05)] transition hover:-translate-y-1'>
           <img src={assets.dashboard_icon_3} alt="" />
           <div>
-            <p className='text-xl font-semibold text-gray-600'>{dashboardData.drafts}</p>
-            <p className='text-gray-400 font-light'>Drafts</p>
+            <p className='text-2xl font-extrabold text-slate-900'>{dashboardData.drafts}</p>
+            <p className='text-sm font-medium text-slate-500'>Drafts</p>
           </div>
         </div>
       </div>
 
-      <div>
-        <div className='flex items-center gap-3 m-4 mt-6 text-gray-600 '>
+      <div className='mt-10'>
+        <div className='mb-4 flex items-center gap-3 text-slate-700'>
           <img src={assets.dashboard_icon_4} alt="" />
-          <p>Your latest blogs</p>
+          <p className='font-[Manrope] text-2xl font-extrabold tracking-[-0.04em]'>Your latest blogs</p>
         </div>
-        <div className='relative max-w-4xl overflow-x-auto shadow rounded-lg scrollbar-hide bg-white'>
-          <table className='w-full text-sm text-gray-500'>
-            <thead className='text-xs text-gray-600 text-left uppercase'>
+        <div className='relative max-w-4xl overflow-x-auto rounded-[1.75rem] bg-white/85 shadow-[0_20px_50px_rgba(39,46,66,0.06)] scrollbar-hide'>
+          <table className='w-full text-sm text-slate-600'>
+            <thead className='text-left text-[11px] uppercase tracking-[0.18em] text-slate-400'>
               <tr>
                 <th scope='col' className='px-2 py-4 xl:px-6'>#</th>
                 <th scope='col' className='px-2 py-4'> Blog Title</th>
