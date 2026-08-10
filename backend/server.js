@@ -9,7 +9,13 @@ import userRouter from './routes/userRoutes.js';
 
 const app = express();
 
-await connectDB()
+try {
+    await connectDB();
+} catch (error) {
+    console.error("Critical: Could not connect to database. Exiting...");
+    process.exit(1);
+}
+
 
 
 // Middleware

@@ -297,7 +297,20 @@ export const AppProvider = ({children})=>{
     return data.message
   }, [])
 
+  const updateWriterProfile = useCallback(async (payload) => {
+    const { data } = await writerAxios.post('/api/writer/update-profile', payload)
+
+    if (!data.success) {
+      throw new Error(data.message)
+    }
+
+    setWriter(data.writer)
+    setWriterProfile((current) => current ? { ...current, writer: data.writer } : current)
+    return data.message
+  }, [])
+
   const verifyWriterReset = useCallback(async (payload) => {
+
     const { data } = await api.post('/api/writer/verify-reset', payload)
 
     if (!data.success) {
@@ -346,6 +359,7 @@ export const AppProvider = ({children})=>{
     registerWriter,
     loginWriter,
     fetchWriterProfile,
+    updateWriterProfile,
     updateWriterPassword,
     verifyWriterReset,
     resetWriterPassword,

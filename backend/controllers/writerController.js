@@ -410,3 +410,54 @@ export const approveWriterCommentById = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 };
+
+export const updateWriterProfile = async (req, res) => {
+    try {
+        const { name, email, phone, description } = req.body;
+
+        if (!name || !email || !phone || !description) {
+            return res.json({ success: false, message: "Name, email, phone, and description are required" });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedPhone = phone.trim();
+
+        const existingWriter = await Writer.findOne({
+            _id: { $ne: req.writer.writerId },
+            $or: [{ email: normalizedEmail }, { phone: normalizedPhone }]
+        });
+
+        if (existingWriter) {
+            if (existingWriter.email === normalizedEmail) {
+                return res.json({ success: false, message: "Email is already in use by another writer" });
+            }
+            if (existingWriter.phone === normalizedPhone) {
+                return res.json({ success: false, message: "Phone number is already in use by another writer" });
+            }
+        }
+
+        const updatedWriter = await Writer.findByIdAndUpdate(
+            req.writer.writerId,
+            {
+                name: name.trim(),
+                email: normalizedEmail,
+                phone: normalizedPhone,
+                description: description.trim()
+            },
+            { new: true }
+        ).select('-password');
+
+        if (!updatedWriter) {
+            return res.status(404).json({ success: false, message: "Writer not found" });
+        }
+
+        res.json({
+            success: true,
+            message: "Writer profile updated successfully",
+            writer: sanitizeWriter(updatedWriter)
+        });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+

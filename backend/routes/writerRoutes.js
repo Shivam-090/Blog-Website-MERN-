@@ -13,6 +13,7 @@ import {
     registerWriter,
     resetWriterPassword,
     updateWriterPassword,
+    updateWriterProfile,
     verifyWriterResetIdentity
 } from '../controllers/writerController.js';
 
@@ -26,7 +27,9 @@ writerRouter.get('/public', getPublicWriterDirectory);
 writerRouter.get('/public/:username', getPublicWriterProfile);
 writerRouter.get('/public/id/:writerId', getPublicWriterProfile);
 writerRouter.get('/profile', auth, getWriterProfile);
+writerRouter.post('/update-profile', auth, updateWriterProfile);
 writerRouter.post('/update-password', auth, updateWriterPassword);
+
 writerRouter.get('/comments', auth, getWriterComments);
 writerRouter.get('/blogs', auth, getWriterBlogs);
 writerRouter.post('/delete-comment', auth, deleteWriterCommentById);
