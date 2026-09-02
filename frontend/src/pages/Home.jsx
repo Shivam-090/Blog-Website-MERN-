@@ -20,7 +20,7 @@ const Home = () => {
   }, [location.hash])
 
   return (
-    <div className="ethereal-shell min-h-screen overflow-x-hidden">
+    <div className="ethereal-shell min-h-screen overflow-x-clip">
       <div className="ethereal-orb ethereal-orb-primary" />
       <div className="ethereal-orb ethereal-orb-secondary" />
 

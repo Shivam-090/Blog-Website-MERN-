@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Menu } from 'lucide-react'
+import { LuMenu, LuUserCheck } from 'react-icons/lu'
 import { Outlet } from 'react-router-dom'
 import WriterSidebar from '../../components/writer/WriterSidebar'
 import { useAppContext } from '../../context/useAppContext'
@@ -17,34 +17,56 @@ const WriterLayout = () => {
   }, [isSidebarOpen])
 
   return (
-    <>
-      <div className='flex h-[76px] items-center justify-between border-b border-[#e7e6fb] bg-white/90 px-4 py-2 backdrop-blur sm:px-12'>
-        <div className='flex items-center gap-3'>
-          <button
-            type='button'
-            onClick={() => setIsSidebarOpen(true)}
-            className='flex h-11 w-11 items-center justify-center rounded-full bg-[#f3f1ff] text-[#702ae1] md:hidden'
-            aria-label='Open writer sidebar'
-          >
-            <Menu className='h-5 w-5' />
-          </button>
-        <span onClick={()=>navigate('/')} className='cursor-pointer'>
-        <span className='md:text-2xl font-bold text-black'>Digital</span> <span className='md:text-2xl font-bold text-[#702ae1] italic'>Ethereal</span>
-        </span>
-        </div>
-        <div className='text-right'>
-          <p className='text-[11px] font-bold uppercase tracking-[0.22em] text-[#8d88b5]'>Writer workspace</p>
-          <p className='text-sm font-semibold text-slate-800'>{writer?.name || 'Writer'}</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#f6f6ff]">
+      {/* Sticky Minimal Writer Topbar */}
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/85 backdrop-blur-md">
+        <div className="flex h-18 items-center justify-between px-4 sm:px-8 lg:px-10">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="flex h-10 w-10 items-center justify-center border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 md:hidden"
+              aria-label="Open writer sidebar"
+            >
+              <LuMenu className="h-5 w-5" />
+            </button>
 
-      <div className='flex min-h-[calc(100vh-76px)] bg-[#f6f6ff]'>
-        <WriterSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-        <div className='min-w-0 flex-1'>
-          <Outlet />
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="group flex items-center text-2xl font-black tracking-tight text-slate-950 sm:text-3xl"
+            >
+              <span className="font-[Manrope] font-extrabold tracking-tight text-slate-900">Digital</span>
+              <span className="ml-1.5 font-[Manrope] font-extrabold italic text-[#702ae1]">Ethereal</span>
+            </button>
+
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#702ae1]/25 bg-[#ede9fe] px-3 py-1 text-xs font-bold text-[#702ae1]">
+              Writer Studio
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => navigate('/writer/profile')}
+              className="flex items-center gap-3 rounded-full border border-slate-200/90 bg-white/90 py-1.5 pl-3 pr-4 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#702ae1] to-[#a855f7] text-xs font-bold text-white">
+                {(writer?.name || 'W').charAt(0).toUpperCase()}
+              </div>
+              <span className="text-xs font-semibold text-slate-800">{writer?.name || 'Writer'}</span>
+            </button>
+          </div>
         </div>
+      </header>
+
+      <div className="flex min-h-[calc(100vh-72px)]">
+        <WriterSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+        <main className="min-w-0 flex-1">
+          <Outlet />
+        </main>
       </div>
-    </>
+    </div>
   )
 }
 

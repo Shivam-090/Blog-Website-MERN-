@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { LuSearch } from 'react-icons/lu'
 import { blogCategories } from '../assets/assets'
 import { useAppContext } from '../context/useAppContext'
 import BlogCard from './BlogCard'
@@ -10,6 +11,13 @@ const BlogList = ({ containerClassName = '' }) => {
 
   const normalizedBlogs = useMemo(() => blogs.map(normalizeBlog), [blogs])
 
+  // Get the single latest blog ID (same as featured in Hero)
+  const latestBlogId = useMemo(() => {
+    if (!normalizedBlogs.length) return null
+    return [...normalizedBlogs].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0]?._id
+  }, [normalizedBlogs])
+
+  // Dynamically extract categories from existing blogs
   const visibleCategories = useMemo(() => {
     const dynamicCategories = normalizedBlogs
       .map((blog) => blog.category)
@@ -23,6 +31,11 @@ const BlogList = ({ containerClassName = '' }) => {
 
   const filteredBlogs = useMemo(() => {
     return normalizedBlogs.filter((blog) => {
+      // On default landing state ('All' and no search input), exclude the hero latest blog if we have more than 1 blog
+      if (activeCategory === 'All' && !input && normalizedBlogs.length > 1 && blog._id === latestBlogId) {
+        return false
+      }
+
       const matchesSearch =
         !input ||
         blog.title?.toLowerCase().includes(input.toLowerCase()) ||
@@ -33,69 +46,93 @@ const BlogList = ({ containerClassName = '' }) => {
 
       return matchesSearch && matchesCategory
     })
-  }, [activeCategory, input, normalizedBlogs])
+  }, [activeCategory, input, normalizedBlogs, latestBlogId])
 
   return (
-    <>
-      <section className="pb-4">
-        <div className={`flex gap-3 overflow-x-auto pb-2 ${containerClassName}`}>
-          {visibleCategories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              onClick={() => setActiveCategory(category)}
-              className={`whitespace-nowrap rounded-full px-6 py-3 text-sm font-semibold transition ${
-                activeCategory === category
-                  ? 'bg-[#702ae1] text-white shadow-[0_20px_40px_rgba(112,42,225,0.2)]'
-                  : 'bg-[#eef0ff] text-slate-600 hover:bg-[#dfe5ff]'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </section>
+    <main id="stories" className="pb-24 pt-2">
+      <div className={containerClassName}>
+        {/* Category Tabs (Left) and Search Input (Right) */}
+        <div className="mb-10 flex flex-col gap-5 border-b border-slate-200/80 md:flex-row md:items-center md:justify-between">
+          {/* Categories Bar */}
+          <div className="flex items-center gap-6 overflow-x-auto pb-px scrollbar-none sm:gap-8">
+            {visibleCategories.map((category) => {
+              const count =
+                category === 'All'
+                  ? normalizedBlogs.length
+                  : normalizedBlogs.filter((b) => b.category === category).length
+              const isActive = activeCategory === category
 
-      <main id="stories" className="pb-20 pt-8">
-        <div className={containerClassName}>
-          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              
-              <h2 className="mt-3 font-[Manrope] text-4xl font-extrabold tracking-[-0.05em] text-slate-900">
-                View the latest stories from our writers
-              </h2>
-            </div>
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setActiveCategory(category)}
+                  className={`relative flex items-center gap-2 whitespace-nowrap pb-3.5 pt-1 text-sm font-semibold transition-colors ${
+                    isActive ? 'text-slate-950' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <span>{category}</span>
+                  {count > 0 && (
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                        isActive
+                          ? 'bg-[#702ae1] text-white shadow-sm'
+                          : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  )}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 h-[2.5px] w-full rounded-full bg-[#702ae1]" />
+                  )}
+                </button>
+              )
+            })}
           </div>
 
-          {filteredBlogs.length ? (
-            <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-              {filteredBlogs.slice(0, 9).map((blog) => (
-                <BlogCard key={blog._id} blog={blog} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-[2rem] bg-[#eef0ff] px-8 py-14 text-center">
-              <h3 className="font-[Manrope] text-3xl font-extrabold tracking-[-0.04em] text-slate-900">
-                No stories match that search yet
-              </h3>
-              <p className="mx-auto mt-3 max-w-2xl text-slate-600">
-                Try another keyword or switch back to a broader topic. Your search is still wired into the existing blog data.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setInput('')
-                  setActiveCategory('All')
-                }}
-                className="mt-6 rounded-full bg-[#702ae1] px-6 py-3 font-semibold text-white"
-              >
-                Reset filters
-              </button>
-            </div>
-          )}
+          {/* Search Box on the Right */}
+          <div className="relative mb-3 w-full md:mb-2 md:w-72 lg:w-80 flex-shrink-0">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Search blog..."
+              className="w-full rounded-full border border-slate-200/90 bg-white/90 py-2.5 pl-4 pr-11 text-sm text-slate-800 placeholder:text-slate-400 shadow-sm transition hover:border-slate-300 focus:border-[#702ae1] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#702ae1]/10"
+            />
+            <LuSearch className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-base text-slate-400" />
+          </div>
         </div>
-      </main>
-    </>
+
+        {/* Minimalist Blog Cards Grid */}
+        {filteredBlogs.length ? (
+          <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredBlogs.map((blog) => (
+              <BlogCard key={blog._id} blog={blog} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-3xl bg-slate-50/80 px-8 py-16 text-center border border-slate-100">
+            <h3 className="font-[Manrope] text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+              No stories match your criteria
+            </h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+              Try searching with another keyword or select another category above.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setInput('')
+                setActiveCategory('All')
+              }}
+              className="mt-6 rounded-full bg-[#702ae1] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-[#5e21c2]"
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
+      </div>
+    </main>
   )
 }
 

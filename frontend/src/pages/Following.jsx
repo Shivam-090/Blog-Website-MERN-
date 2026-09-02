@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { LuArrowRight, LuHeartHandshake, LuUserRound } from 'react-icons/lu'
+import { LuArrowRight, LuHeartHandshake, LuSparkles, LuUserRound, LuUsers } from 'react-icons/lu'
 import toast from 'react-hot-toast'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -31,70 +31,92 @@ const Following = () => {
   }, [fetchUserProfile, navigate, userToken])
 
   return (
-    <div className="ethereal-shell min-h-screen bg-[#f6f6ff]">
+    <div className="ethereal-shell min-h-screen overflow-x-clip bg-[#f6f6ff]">
       <div className="ethereal-orb ethereal-orb-primary" />
       <div className="ethereal-orb ethereal-orb-secondary" />
 
       <Navbar containerClassName="mx-auto w-full px-4 sm:px-6 lg:px-10" />
 
-      <main className="mx-auto w-full px-4 pb-16 pt-8 sm:px-6 lg:px-10">
-        <section className="rounded-[2.5rem] bg-white/78 p-8 shadow-[0_24px_70px_rgba(39,46,66,0.08)] backdrop-blur-xl">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#f3f1ff] px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#702ae1]">
-                <LuHeartHandshake className="h-4 w-4" />
-                Following
-              </div>
-              <h1 className="mt-4 font-[Manrope] text-4xl font-extrabold tracking-[-0.05em] text-slate-900">
-                Writers you follow
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
-                Keep up with the authors whose ideas, essays, and blog stories you want to revisit.
-              </p>
+      <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12 lg:px-10">
+        {/* Header Section */}
+        <div className="mb-10 flex flex-col gap-4 border-b border-slate-200/80 pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-3">
+            <div className="inline-flex items-center rounded-full bg-[#ede9fe] px-3.5 py-1 text-xs font-bold text-[#702ae1]">
+              Following Feed
             </div>
-            <div className="rounded-full bg-[#eef0ff] px-5 py-3 text-sm font-semibold text-slate-600">
-              {userProfile?.followingWriters?.length || 0} followed writers
-            </div>
+            <h1 className="font-[Manrope] text-3xl font-extrabold tracking-[-0.04em] text-slate-900 sm:text-4xl lg:text-5xl">
+              Writers You Follow
+            </h1>
+            <p className="max-w-2xl text-base text-slate-500 sm:text-lg">
+              Keep up with the thinkers, essayists, and creators whose work you want to revisit regularly.
+            </p>
           </div>
-        </section>
 
-        <section className="mt-10">
+          <div className="flex-shrink-0">
+            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 shadow-sm">
+              <LuUsers className="h-4 w-4 text-[#702ae1]" />
+              {userProfile?.followingWriters?.length || 0} Authors
+            </span>
+          </div>
+        </div>
+
+        {/* Following List */}
+        <section>
           {isLoading ? (
             <div className="flex min-h-[40vh] items-center justify-center">
               <Loader />
             </div>
           ) : userProfile?.followingWriters?.length ? (
-            <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {userProfile.followingWriters.map((writer) => (
-                <button
+                <div
                   key={writer._id}
-                  type="button"
                   onClick={() => navigate(`/writers/${writer.username}`)}
-                  className="rounded-[2rem] bg-white/80 p-6 text-left shadow-[0_20px_40px_rgba(39,46,66,0.06)] transition hover:-translate-y-1"
+                  className="group flex cursor-pointer flex-col justify-between rounded-2xl border border-slate-200/80 bg-white/90 p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-[#702ae1]/40 hover:shadow-md"
                 >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(135deg,#702ae1,#57d2d0)] p-1">
-                    <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-[#702ae1]">
-                      <LuUserRound className="h-8 w-8" />
+                  <div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-13 w-13 items-center justify-center rounded-full bg-gradient-to-tr from-[#702ae1] to-[#a855f7] text-xl font-bold text-white shadow-sm">
+                        {(writer.name || 'W').charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="truncate font-[Manrope] text-lg font-bold text-slate-900 transition group-hover:text-[#702ae1]">
+                          {writer.name}
+                        </h2>
+                        <p className="truncate text-xs font-semibold text-[#702ae1]">@{writer.username}</p>
+                      </div>
                     </div>
+
+                    <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-slate-600">
+                      {writer.description || 'Contributing author on Digital Ethereal.'}
+                    </p>
                   </div>
-                  <h2 className="mt-5 font-[Manrope] text-2xl font-extrabold tracking-[-0.04em] text-slate-900">
-                    {writer.name}
-                  </h2>
-                  <p className="mt-2 text-sm font-medium text-[#702ae1]">@{writer.username}</p>
-                  <p className="mt-4 line-clamp-4 text-sm leading-7 text-slate-600">{writer.description}</p>
-                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#702ae1]">
-                    View writer page
-                    <LuArrowRight className="h-4 w-4" />
-                  </span>
-                </button>
+
+                  <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-bold text-[#702ae1]">
+                    <span>View Profile & Stories</span>
+                    <LuArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
-            <div className="rounded-[2rem] bg-white/75 p-10 text-center shadow-[0_20px_40px_rgba(39,46,66,0.05)]">
-              <p className="font-[Manrope] text-3xl font-extrabold tracking-[-0.05em] text-slate-900">No followed writers yet</p>
-              <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-                Follow writers from any blog post or writer page and they will show up here.
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-8 py-16 text-center backdrop-blur-sm">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#ede9fe] text-xl text-[#702ae1]">
+                <LuHeartHandshake className="h-6 w-6" />
+              </div>
+              <h3 className="mt-4 font-[Manrope] text-2xl font-extrabold text-slate-900">
+                You are not following any writers yet
+              </h3>
+              <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+                Discover independent creators, essays, and stories across the platform and click follow on their profile.
               </p>
+              <button
+                type="button"
+                onClick={() => navigate('/writers')}
+                className="mt-6 rounded-full bg-[#702ae1] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-[#5e21c2]"
+              >
+                Browse Writers Directory
+              </button>
             </div>
           )}
         </section>

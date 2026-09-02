@@ -122,7 +122,7 @@ const Blog = () => {
   }
 
   return (
-    <div className="ethereal-shell min-h-screen overflow-x-hidden bg-[#f6f6ff]">
+    <div className="ethereal-shell min-h-screen overflow-x-clip bg-[#f6f6ff]">
       <div className="ethereal-orb ethereal-orb-primary" />
       <div className="ethereal-orb ethereal-orb-secondary" />
 

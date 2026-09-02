@@ -1,60 +1,84 @@
 import React from 'react'
-import { assets } from '../../assets/assets';
-import { useAppContext } from '../../context/useAppContext';
-import toast from 'react-hot-toast';
+import { LuCheck, LuTrash2 } from 'react-icons/lu'
+import { useAppContext } from '../../context/useAppContext'
+import toast from 'react-hot-toast'
 
-const WriterCommentTableItem = ({comment, fetchComments}) => {
-  const {writerAxios} = useAppContext()
-  const {blog, createdAt, _id} = comment;
-  const commentDate = new Date(createdAt);
+const WriterCommentTableItem = ({ comment, fetchComments }) => {
+  const { writerAxios } = useAppContext()
+  const { blog, createdAt, _id } = comment
+  const commentDate = new Date(createdAt)
 
-  const approveComment = async ()=>{
-    try{
-      const {data} = await writerAxios.post('/api/writer/approve-comment', {id: _id})
-      if (data.success){
+  const approveComment = async () => {
+    try {
+      const { data } = await writerAxios.post('/api/writer/approve-comment', { id: _id })
+      if (data.success) {
         toast.success(data.message)
         fetchComments()
-      }else{
+      } else {
         toast.error(data.message)
       }
-    }catch (error){
+    } catch (error) {
       toast.error(error.message)
     }
   }
 
-  const deleteComment = async ()=>{
-    try{
+  const deleteComment = async () => {
+    try {
       const confirmDelete = window.confirm('Are you sure you want to delete this comment?')
-      if(!confirmDelete) return;
-      const {data} = await writerAxios.post('/api/writer/delete-comment', {id: _id})
-      if (data.success){
+      if (!confirmDelete) return
+      const { data } = await writerAxios.post('/api/writer/delete-comment', { id: _id })
+      if (data.success) {
         toast.success(data.message)
         fetchComments()
-      }else{
+      } else {
         toast.error(data.message)
       }
-    }catch (error){
+    } catch (error) {
       toast.error(error.message)
     }
   }
 
   return (
-    <tr className='border-y border-[#ecebfa]'>
-      <td className='px-6 py-4'>
-        <b className='font-medium text-slate-700'>Blog</b>: {blog.title}
-        <br />
-        <br />
-        <b className='font-medium text-slate-700'>Name</b>: {comment.name}
-        <br />
-        <b className='font-medium text-slate-700'>Comment</b>: {comment.content}
+    <tr className="transition hover:bg-slate-50/60">
+      <td className="px-5 py-4">
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold text-[#702ae1]">On: {blog?.title || 'Editorial Story'}</p>
+          <p className="text-sm font-semibold text-slate-900">{comment.name || 'Anonymous Reader'}</p>
+          <p className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs leading-relaxed text-slate-600">
+            "{comment.content}"
+          </p>
+        </div>
       </td>
-      <td className='px-6 py-4 text-sm text-slate-500 max-sm:hidden'>
+
+      <td className="px-5 py-4 text-xs text-slate-400 max-sm:hidden whitespace-nowrap">
         {commentDate.toLocaleDateString()}
       </td>
-      <td className='px-6 py-4'>
-        <div className='inline-flex items-center gap-4'>
-          {!comment.isApproved ? <img onClick={approveComment} src={assets.tick_icon} alt="" className='w-5 cursor-pointer transition-all hover:scale-110' /> : <p className='rounded-full border border-[#86efac] bg-[#dcfce7] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#15803d]'>Approved</p>}
-          <img onClick={deleteComment} src={assets.bin_icon} alt="" className='w-5 hover:scale-110 transition-all cursor-pointer' />
+
+      <td className="px-5 py-4 text-right whitespace-nowrap">
+        <div className="flex items-center justify-end gap-2">
+          {!comment.isApproved ? (
+            <button
+              type="button"
+              onClick={approveComment}
+              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+            >
+              <LuCheck className="h-3.5 w-3.5" />
+              Approve
+            </button>
+          ) : (
+            <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+              Published
+            </span>
+          )}
+
+          <button
+            type="button"
+            onClick={deleteComment}
+            aria-label="Delete comment"
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600 shadow-sm"
+          >
+            <LuTrash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       </td>
     </tr>

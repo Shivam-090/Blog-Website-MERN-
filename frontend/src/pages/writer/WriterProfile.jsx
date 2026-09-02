@@ -5,7 +5,8 @@ import toast from 'react-hot-toast'
 import { useAppContext } from '../../context/useAppContext'
 
 const WriterProfile = () => {
-  const { writerToken, writerProfile, fetchWriterProfile, updateWriterProfile, updateWriterPassword, navigate } = useAppContext()
+  const { writerToken, writerProfile, fetchWriterProfile, updateWriterProfile, updateWriterPassword, navigate } =
+    useAppContext()
   const [isLoading, setIsLoading] = useState(true)
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
@@ -54,12 +55,15 @@ const WriterProfile = () => {
     }
   }, [writerProfile])
 
-  const stats = useMemo(() => ({
-    totalBlogs: writerProfile?.blogs?.length || 0,
-    publishedBlogs: writerProfile?.blogs?.filter((blog) => blog.isPublished).length || 0,
-    draftBlogs: writerProfile?.blogs?.filter((blog) => !blog.isPublished).length || 0,
-    comments: writerProfile?.comments?.length || 0
-  }), [writerProfile])
+  const stats = useMemo(
+    () => ({
+      totalBlogs: writerProfile?.blogs?.length || 0,
+      publishedBlogs: writerProfile?.blogs?.filter((blog) => blog.isPublished).length || 0,
+      draftBlogs: writerProfile?.blogs?.filter((blog) => !blog.isPublished).length || 0,
+      comments: writerProfile?.comments?.length || 0
+    }),
+    [writerProfile]
+  )
 
   const handleProfileSubmit = async (event) => {
     event.preventDefault()
@@ -106,7 +110,7 @@ const WriterProfile = () => {
   if (isLoading) {
     return (
       <div className="flex-1 bg-[#f6f6ff] p-4 md:p-8 xl:p-10">
-        <div className="rounded-[2rem] bg-white/80 p-8 text-sm text-slate-500 shadow-[0_20px_50px_rgba(39,46,66,0.06)]">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-8 text-center text-sm text-slate-500 shadow-sm">
           Loading writer profile...
         </div>
       </div>
@@ -116,7 +120,7 @@ const WriterProfile = () => {
   if (!writerProfile) {
     return (
       <div className="flex-1 bg-[#f6f6ff] p-4 md:p-8 xl:p-10">
-        <div className="rounded-[2rem] bg-white/80 p-8 text-sm text-slate-500 shadow-[0_20px_50px_rgba(39,46,66,0.06)]">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-8 text-center text-sm text-slate-500 shadow-sm">
           Unable to load writer profile.
         </div>
       </div>
@@ -125,38 +129,46 @@ const WriterProfile = () => {
 
   return (
     <div className="min-w-0 flex-1 bg-[#f6f6ff] p-4 md:p-8 xl:p-10">
-      <section className="space-y-6">
-        <div className="rounded-[2rem] bg-white/82 p-6 shadow-[0_20px_50px_rgba(39,46,66,0.06)] backdrop-blur-xl sm:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#702ae1]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#702ae1]">
-                <Sparkles className="h-4 w-4" />
-                Current account
+      <div className="mx-auto max-w-6xl space-y-6">
+        {/* Main Writer Identity Card */}
+        <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-sm sm:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-6">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-[#702ae1] to-[#a855f7] text-2xl font-black text-white shadow-sm">
+                {(writerProfile.writer.name || 'W').charAt(0).toUpperCase()}
               </div>
-              <h2 className="mt-4 font-[Manrope] text-3xl font-extrabold tracking-[-0.05em] text-slate-900">
-                Your writer identity
-              </h2>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-[Manrope] text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+                    {writerProfile.writer.name}
+                  </h2>
+                  <span className="rounded-full border border-[#702ae1]/30 bg-[#ede9fe] px-2.5 py-0.5 text-[11px] font-bold text-[#702ae1]">
+                    Author
+                  </span>
+                </div>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Member since {Moment(writerProfile.writer.createdAt).format('MMMM YYYY')}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-[#eef0ff] px-4 py-2 text-sm font-semibold text-slate-600">
-                Joined {Moment(writerProfile.writer.createdAt).format('MMMM D, YYYY')}
-              </div>
+
+            <div>
               {!isEditingProfile ? (
                 <button
                   type="button"
                   onClick={() => setIsEditingProfile(true)}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-[#702ae1] px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_rgba(112,42,225,0.2)] transition hover:bg-[#5b1ebf]"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#702ae1] px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-[#5e21c2]"
                 >
-                  <Edit3 className="h-4 w-4" />
-                  Edit profile
+                  <Edit3 className="h-3.5 w-3.5" />
+                  Edit Profile
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={cancelEditing}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-300"
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-xs font-bold uppercase tracking-wider text-slate-600 shadow-sm transition hover:bg-slate-50"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                   Cancel
                 </button>
               )}
@@ -164,153 +176,124 @@ const WriterProfile = () => {
           </div>
 
           {!isEditingProfile ? (
-            <>
-              <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <div className="rounded-[1.5rem] bg-[#f7f8ff] p-5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-[#702ae1] shadow-[0_10px_20px_rgba(39,46,66,0.06)]">
-                    <UserRound className="h-5 w-5" />
-                  </div>
-                  <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Full name</p>
-                  <p className="mt-2 text-base font-semibold text-slate-900">{writerProfile.writer.name}</p>
+            <div className="mt-6 space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Full Name</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900">{writerProfile.writer.name}</p>
                 </div>
 
-                <div className="rounded-[1.5rem] bg-[#f7f8ff] p-5">
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-[#702ae1] shadow-[0_10px_20px_rgba(39,46,66,0.06)]">
-                      <AtSign className="h-5 w-5" />
-                    </div>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-200/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                      <Lock className="h-3 w-3" /> Fixed
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Username</p>
+                    <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+                      <Lock className="h-2.5 w-2.5" /> Locked
                     </span>
                   </div>
-                  <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Username</p>
-                  <p className="mt-2 break-all text-base font-semibold text-slate-900">@{writerProfile.writer.username}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900">@{writerProfile.writer.username}</p>
                 </div>
 
-                <div className="rounded-[1.5rem] bg-[#f7f8ff] p-5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-[#702ae1] shadow-[0_10px_20px_rgba(39,46,66,0.06)]">
-                    <Mail className="h-5 w-5" />
-                  </div>
-                  <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Email</p>
-                  <p className="mt-2 break-all text-base font-semibold text-slate-900">{writerProfile.writer.email}</p>
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Email Address</p>
+                  <p className="mt-1 truncate text-sm font-semibold text-slate-900">{writerProfile.writer.email}</p>
                 </div>
 
-                <div className="rounded-[1.5rem] bg-[#f7f8ff] p-5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-[#702ae1] shadow-[0_10px_20px_rgba(39,46,66,0.06)]">
-                    <Phone className="h-5 w-5" />
-                  </div>
-                  <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Phone</p>
-                  <p className="mt-2 text-base font-semibold text-slate-900">{writerProfile.writer.phone}</p>
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Phone</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900">{writerProfile.writer.phone || 'Not set'}</p>
                 </div>
               </div>
 
-              <div className="mt-6 rounded-[1.75rem] bg-[#f7f3ff] p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-[#702ae1] shadow-[0_10px_20px_rgba(39,46,66,0.06)]">
-                    <FileText className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Writer description</p>
-                    <p className="mt-3 text-sm leading-7 text-slate-700">{writerProfile.writer.description}</p>
-                  </div>
-                </div>
+              <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">About the Author</p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                  {writerProfile.writer.description || 'No bio provided yet.'}
+                </p>
               </div>
-            </>
+            </div>
           ) : (
-            <form onSubmit={handleProfileSubmit} className="mt-8 space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
+            <form onSubmit={handleProfileSubmit} className="mt-6 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Full name</label>
-                  <div className="relative">
-                    <UserRound className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="text"
-                      value={profileForm.name}
-                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                      required
-                      className="w-full rounded-2xl bg-[#f7f8ff] py-3.5 pl-12 pr-4 text-slate-900 outline-none transition focus:shadow-[0_0_0_3px_rgba(112,42,225,0.12)]"
-                      placeholder="Your full name"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Username</label>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400">
-                      <Lock className="h-3 w-3" /> Cannot be changed
-                    </span>
-                  </div>
-                  <div className="relative">
-                    <AtSign className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="text"
-                      value={writerProfile.writer.username}
-                      disabled
-                      readOnly
-                      className="w-full cursor-not-allowed rounded-2xl bg-slate-100 py-3.5 pl-12 pr-4 font-semibold text-slate-500 outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Email address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="email"
-                      value={profileForm.email}
-                      onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                      required
-                      className="w-full rounded-2xl bg-[#f7f8ff] py-3.5 pl-12 pr-4 text-slate-900 outline-none transition focus:shadow-[0_0_0_3px_rgba(112,42,225,0.12)]"
-                      placeholder="writer@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Phone number</label>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="tel"
-                      value={profileForm.phone}
-                      onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                      required
-                      className="w-full rounded-2xl bg-[#f7f8ff] py-3.5 pl-12 pr-4 text-slate-900 outline-none transition focus:shadow-[0_0_0_3px_rgba(112,42,225,0.12)]"
-                      placeholder="Phone number"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Writer description</label>
-                <div className="relative">
-                  <textarea
-                    rows={4}
-                    value={profileForm.description}
-                    onChange={(e) => setProfileForm({ ...profileForm, description: e.target.value })}
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={profileForm.name}
+                    onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
                     required
-                    className="w-full rounded-2xl bg-[#f7f8ff] p-4 text-slate-900 outline-none transition focus:shadow-[0_0_0_3px_rgba(112,42,225,0.12)]"
-                    placeholder="Describe your writing background and interests..."
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-slate-900 transition focus:border-[#702ae1] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#702ae1]/10"
+                    placeholder="Your name"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={profileForm.email}
+                    onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                    required
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-slate-900 transition focus:border-[#702ae1] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#702ae1]/10"
+                    placeholder="Email"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={profileForm.phone}
+                    onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-slate-900 transition focus:border-[#702ae1] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#702ae1]/10"
+                    placeholder="Phone number"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">
+                    Username (Permanent)
+                  </label>
+                  <input
+                    type="text"
+                    value={writerProfile.writer.username}
+                    disabled
+                    readOnly
+                    className="w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm text-slate-500 outline-none"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                  Author Biography
+                </label>
+                <textarea
+                  rows={3}
+                  value={profileForm.description}
+                  onChange={(e) => setProfileForm({ ...profileForm, description: e.target.value })}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 text-sm text-slate-900 transition focus:border-[#702ae1] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#702ae1]/10"
+                  placeholder="Tell readers about your perspective and writing focus..."
+                />
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
                 <button
                   type="submit"
                   disabled={isUpdatingProfile}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#702ae1,#b28cff)] px-6 py-3.5 text-sm font-bold text-white shadow-[0_18px_34px_rgba(112,42,225,0.2)] transition hover:opacity-95 disabled:opacity-60"
+                  className="rounded-full bg-[#702ae1] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-[#5e21c2] disabled:opacity-60"
                 >
-                  <Save className="h-4 w-4" />
-                  {isUpdatingProfile ? 'Saving profile...' : 'Save changes'}
+                  {isUpdatingProfile ? 'Saving...' : 'Save Profile'}
                 </button>
                 <button
                   type="button"
                   onClick={cancelEditing}
-                  className="rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50"
+                  className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-600 transition hover:bg-slate-50"
                 >
                   Cancel
                 </button>
@@ -319,63 +302,79 @@ const WriterProfile = () => {
           )}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-[1.75rem] bg-white/82 p-6 shadow-[0_20px_50px_rgba(39,46,66,0.06)]">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Total blogs</p>
-            <p className="mt-3 font-[Manrope] text-4xl font-extrabold tracking-[-0.04em] text-slate-900">{stats.totalBlogs}</p>
+        {/* 4 Metric Stats Cards */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Stories</span>
+            <p className="mt-3 font-[Manrope] text-3xl font-extrabold tracking-tight text-slate-900">{stats.totalBlogs}</p>
           </div>
-          <div className="rounded-[1.75rem] bg-white/82 p-6 shadow-[0_20px_50px_rgba(39,46,66,0.06)]">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Published</p>
-            <p className="mt-3 font-[Manrope] text-4xl font-extrabold tracking-[-0.04em] text-slate-900">{stats.publishedBlogs}</p>
+          <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Published</span>
+            <p className="mt-3 font-[Manrope] text-3xl font-extrabold tracking-tight text-slate-900">
+              {stats.publishedBlogs}
+            </p>
           </div>
-          <div className="rounded-[1.75rem] bg-white/82 p-6 shadow-[0_20px_50px_rgba(39,46,66,0.06)]">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Drafts</p>
-            <p className="mt-3 font-[Manrope] text-4xl font-extrabold tracking-[-0.04em] text-slate-900">{stats.draftBlogs}</p>
+          <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Drafts</span>
+            <p className="mt-3 font-[Manrope] text-3xl font-extrabold tracking-tight text-slate-900">{stats.draftBlogs}</p>
           </div>
-          <div className="rounded-[1.75rem] bg-white/82 p-6 shadow-[0_20px_50px_rgba(39,46,66,0.06)]">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Comments</p>
-            <p className="mt-3 font-[Manrope] text-4xl font-extrabold tracking-[-0.04em] text-slate-900">{stats.comments}</p>
+          <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Reader Comments</span>
+            <p className="mt-3 font-[Manrope] text-3xl font-extrabold tracking-tight text-slate-900">{stats.comments}</p>
           </div>
         </div>
 
-        <div className="rounded-[2rem] bg-white/82 p-6 shadow-[0_20px_50px_rgba(39,46,66,0.06)] backdrop-blur-xl sm:p-8">
+        {/* Security / Password Update */}
+        <div className="max-w-2xl rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-sm sm:p-8">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#702ae1]/10 text-[#702ae1]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3f0ff] text-[#702ae1]">
               <KeyRound className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="font-[Manrope] text-2xl font-extrabold tracking-[-0.04em] text-slate-900">Update password</h2>
-              <p className="mt-1 text-sm text-slate-500">Keep your writer dashboard secure.</p>
+              <h3 className="font-[Manrope] text-xl font-bold text-slate-900">Security Credentials</h3>
+              <p className="text-xs text-slate-500">Update your writer account login password</p>
             </div>
           </div>
 
-          <form onSubmit={handlePasswordSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
-            <input
-              type="password"
-              placeholder="Current password"
-              value={passwordForm.currentPassword}
-              onChange={(event) => setPasswordForm((current) => ({ ...current, currentPassword: event.target.value }))}
-              required
-              className="rounded-2xl bg-[#f7f8ff] px-4 py-3 text-slate-700 outline-none transition focus:shadow-[0_0_0_3px_rgba(112,42,225,0.12)]"
-            />
-            <input
-              type="password"
-              placeholder="New password"
-              value={passwordForm.newPassword}
-              onChange={(event) => setPasswordForm((current) => ({ ...current, newPassword: event.target.value }))}
-              required
-              className="rounded-2xl bg-[#f7f8ff] px-4 py-3 text-slate-700 outline-none transition focus:shadow-[0_0_0_3px_rgba(112,42,225,0.12)]"
-            />
+          <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                Current Password
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={passwordForm.currentPassword}
+                onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
+                required
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#702ae1] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#702ae1]/10"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                New Password
+              </label>
+              <input
+                type="password"
+                placeholder="New password (min 6 characters)"
+                value={passwordForm.newPassword}
+                onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
+                required
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#702ae1] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#702ae1]/10"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={isUpdatingPassword}
-              className="rounded-2xl bg-[linear-gradient(135deg,#702ae1,#b28cff)] px-5 py-3 text-sm font-bold text-white shadow-[0_18px_34px_rgba(112,42,225,0.2)] transition hover:opacity-95 disabled:opacity-60"
+              className="rounded-full bg-[#702ae1] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-[#5e21c2] disabled:opacity-60"
             >
-              {isUpdatingPassword ? 'Updating...' : 'Update writer password'}
+              {isUpdatingPassword ? 'Saving...' : 'Update Password'}
             </button>
           </form>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

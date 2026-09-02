@@ -1,63 +1,95 @@
 import React from 'react'
-import { X } from 'lucide-react'
+import {
+  LuLayoutDashboard,
+  LuList,
+  LuLogOut,
+  LuMessageSquare,
+  LuSquarePen,
+  LuUser,
+  LuX
+} from 'react-icons/lu'
 import { NavLink } from 'react-router-dom'
-import { assets } from '../../assets/assets'
 import { useAppContext } from '../../context/useAppContext'
 
 const WriterSidebar = ({ isOpen, setIsOpen }) => {
   const { logoutWriter, navigate } = useAppContext()
 
+  const navItems = [
+    { to: '/writer', label: 'Dashboard', icon: <LuLayoutDashboard className="h-4 w-4" />, end: true },
+    { to: '/writer/addBlog', label: 'Create Story', icon: <LuSquarePen className="h-4 w-4" /> },
+    { to: '/writer/listBlog', label: 'My Stories', icon: <LuList className="h-4 w-4" /> },
+    { to: '/writer/comments', label: 'Comments', icon: <LuMessageSquare className="h-4 w-4" /> },
+    { to: '/writer/profile', label: 'Writer Profile', icon: <LuUser className="h-4 w-4" /> }
+  ]
+
   return (
     <>
+      {/* Mobile Backdrop */}
       <button
-        type='button'
+        type="button"
         onClick={() => setIsOpen(false)}
-        className={`fixed inset-0 z-30 bg-[#101426]/35 backdrop-blur-sm transition md:hidden ${isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
-        aria-label='Close writer sidebar overlay'
+        className={`fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm transition-opacity md:hidden ${
+          isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        aria-label="Close writer sidebar overlay"
       />
 
-      <div className={`fixed left-0 top-0 z-40 flex h-[100dvh] w-[84%] max-w-[280px] flex-col border-r border-[#e7e6fb] bg-white/95 pt-6 shadow-[0_18px_40px_rgba(39,46,66,0.08)] backdrop-blur-xl transition-transform duration-300 md:static md:h-auto md:min-h-[calc(100vh-76px)] md:w-auto md:max-w-none md:flex-shrink-0 md:self-stretch md:translate-x-0 md:bg-white/82 md:shadow-[0_18px_40px_rgba(39,46,66,0.04)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-      <div className='mb-4 flex items-center justify-between px-4 md:hidden'>
-        <p className='text-xs font-bold uppercase tracking-[0.22em] text-[#8d88b5]'>Writer menu</p>
-        <button
-          type='button'
-          onClick={() => setIsOpen(false)}
-          className='flex h-10 w-10 items-center justify-center rounded-full bg-[#f3f1ff] text-[#702ae1]'
-          aria-label='Close writer sidebar'
-        >
-          <X className='h-5 w-5' />
-        </button>
-      </div>
+      <aside
+        className={`fixed left-0 top-0 z-50 flex h-full w-[80%] max-w-[260px] flex-col border-r border-slate-200/80 bg-white/95 p-5 backdrop-blur-xl transition-transform duration-300 md:sticky md:top-[72px] md:z-30 md:h-[calc(100vh-72px)] md:w-64 md:flex-shrink-0 md:translate-x-0 md:overflow-y-auto md:bg-white/90 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Mobile Header */}
+        <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4 md:hidden">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#702ae1]">Writer Menu</span>
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            className="flex h-8 w-8 items-center justify-center border border-slate-200 bg-slate-50 text-slate-600"
+            aria-label="Close writer sidebar"
+          >
+            <LuX className="h-4 w-4" />
+          </button>
+        </div>
 
-      <NavLink end to='/writer' onClick={() => setIsOpen(false)} className={({ isActive }) =>`flex items-center gap-3 px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-[#f3f1ff] md:min-w-64 md:px-9 ${isActive && 'border-r-4 border-[#702ae1] bg-[#f3f1ff] text-[#702ae1] hover:bg-[#f3f1ff]'}`}>
-        <img src={assets.home_icon} alt="" />
-        <p>Writer Dashboard</p>
-      </NavLink>
+        {/* Navigation Links */}
+        <nav className="space-y-1.5 pt-2">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              end={item.end}
+              to={item.to}
+              onClick={() => setIsOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                  isActive
+                    ? 'bg-[#ede9fe] text-[#702ae1] shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'
+                }`
+              }
+            >
+              <span className="flex-shrink-0">{item.icon}</span>
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </nav>
 
-      <NavLink to='/writer/addBlog' onClick={() => setIsOpen(false)} className={({ isActive }) =>`flex items-center gap-3 px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-[#f3f1ff] md:min-w-64 md:px-9 ${isActive && 'border-r-4 border-[#702ae1] bg-[#f3f1ff] text-[#702ae1] hover:bg-[#f3f1ff]'}`}>
-        <img src={assets.add_icon} alt="" />
-        <p>Add blogs</p>
-      </NavLink>
-
-      <NavLink to='/writer/listBlog' onClick={() => setIsOpen(false)} className={({ isActive }) =>`flex items-center gap-3 px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-[#f3f1ff] md:min-w-64 md:px-9 ${isActive && 'border-r-4 border-[#702ae1] bg-[#f3f1ff] text-[#702ae1] hover:bg-[#f3f1ff]'}`}>
-        <img src={assets.list_icon} alt="" />
-        <p>Blog lists</p>
-      </NavLink>
-
-      <NavLink to='/writer/comments' onClick={() => setIsOpen(false)} className={({ isActive }) =>`flex items-center gap-3 px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-[#f3f1ff] md:min-w-64 md:px-9 ${isActive && 'border-r-4 border-[#702ae1] bg-[#f3f1ff] text-[#702ae1] hover:bg-[#f3f1ff]'}`}>
-        <img src={assets.comment_icon} alt="" className='w-6' />
-        <p>Comments</p>
-      </NavLink>
-
-       <NavLink to='/writer/profile' onClick={() => setIsOpen(false)} className={({ isActive }) =>`flex items-center gap-3 px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-[#f3f1ff] md:min-w-64 md:px-9 ${isActive && 'border-r-4 border-[#702ae1] bg-[#f3f1ff] text-[#702ae1] hover:bg-[#f3f1ff]'}`}>
-        <img src={assets.user_icon} alt="" className='w-5' />
-        <p>Writer Profile</p>
-      </NavLink>
-
-      <button onClick={() => { logoutWriter(); navigate('/'); setIsOpen(false) }} className='mx-3 mb-6 mt-auto rounded-2xl border border-rose-200 bg-white px-4 py-3 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 md:mx-9'>
-        Logout
-      </button>
-    </div>
+        {/* Logout Action */}
+        <div className="mt-auto border-t border-slate-100 pt-4">
+          <button
+            type="button"
+            onClick={() => {
+              logoutWriter()
+              navigate('/')
+              setIsOpen(false)
+            }}
+            className="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-600 shadow-sm transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600"
+          >
+            <LuLogOut className="h-4 w-4" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </aside>
     </>
   )
 }

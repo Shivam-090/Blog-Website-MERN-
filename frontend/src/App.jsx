@@ -7,6 +7,7 @@ import Profile from "./pages/Profile.jsx"
 import Following from "./pages/Following.jsx"
 import Writers from "./pages/Writers.jsx"
 import WriterDetails from "./pages/WriterDetails.jsx"
+import About from "./pages/About.jsx"
 import WriterLayout from "./pages/writer/WriterLayout.jsx"
 import WriterDashboard from "./pages/writer/WriterDashboard.jsx"
 import WriterAddBlog from "./pages/writer/WriterAddBlog.jsx"
@@ -37,6 +38,7 @@ function App() {
         <Route path="/writers" element={<Writers />} />
         <Route path="/writers/:username" element={<WriterDetails />} />
         <Route path="/writers/id/:writerId" element={<WriterDetails />} />
+        <Route path="/about" element={<About />} />
         <Route path='/writer' element={writerToken ? <WriterLayout />: <WriterAuth/>}> 
         <Route index element={<WriterDashboard/>}/>
         <Route path='profile' element={<WriterProfile/>}/>

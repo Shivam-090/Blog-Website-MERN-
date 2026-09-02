@@ -1,5 +1,4 @@
 import React from 'react'
-import { LuArrowRight, LuMessageCircle, LuTrendingUp } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
 import BlogEngagement from './BlogEngagement'
 import { formatDate, normalizeBlog } from '../utils/homeDisplay'
@@ -11,38 +10,48 @@ const BlogCard = ({ blog }) => {
   return (
     <article
       onClick={() => navigate(`/blog/${blog._id}`)}
-      className="group cursor-pointer rounded-[2rem] bg-white/85 p-5 shadow-[0_20px_40px_rgba(39,46,66,0.06)] transition hover:-translate-y-1"
+      className="group flex cursor-pointer flex-col transition duration-300"
     >
-      <div className="relative overflow-hidden rounded-[1.5rem]">
+      {/* Minimalist Rounded Image */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100 shadow-sm">
         <img
           src={blog.image}
           alt={blog.title}
-          className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-105"
+          className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-105"
         />
-        <div className="absolute left-4 top-4">
-          <span className="glass-panel rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-700">
-            {blog.category || 'Editorial'}
-          </span>
-        </div>
       </div>
 
-      <div className="space-y-4 px-1 pb-1 pt-5">
-        <div className="flex items-center justify-between gap-3 text-sm text-slate-500">
-          <span>{formatDate(blog.createdAt)}</span>
-          <span className="truncate">{blog.writerName || 'Digital Editorial'}</span>
-        </div>
+      {/* Content Area */}
+      <div className="flex flex-1 flex-col pt-3.5">
+        {/* Category in Purple */}
+        <span className="text-xs font-bold uppercase tracking-wider text-[#702ae1]">
+          {blog.category || 'Technology'}
+        </span>
 
-        <div>
-          <h3 className="font-[Manrope] text-2xl font-extrabold leading-tight tracking-[-0.04em] text-slate-900 transition group-hover:text-[#702ae1]">
-            {blog.title}
-          </h3>
-          <p className="mt-3 line-clamp-3 text-sm leading-7 text-slate-600">
+        {/* Title */}
+        <h3 className="mt-1.5 font-[Manrope] text-xl font-bold leading-snug tracking-tight text-slate-900 transition-colors group-hover:text-[#702ae1] sm:text-2xl">
+          {blog.title}
+        </h3>
+
+        {/* Subtitle / Excerpt */}
+        {(normalizedBlog.plainSubtitle || normalizedBlog.plainDescription) && (
+          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-500">
             {normalizedBlog.plainSubtitle || normalizedBlog.plainDescription}
           </p>
-        </div>
+        )}
 
-       
-        <BlogEngagement blog={blog} compact className="pt-2" />
+        {/* Author & Date Meta */}
+        <div className="mt-auto flex items-center justify-between pt-4 text-xs font-medium text-slate-400">
+          <div className="flex items-center gap-2 truncate">
+            <span className="truncate font-semibold text-slate-700">
+              {blog.writerName || 'Digital Editorial'}
+            </span>
+            <span>•</span>
+            <span className="flex-shrink-0">{formatDate(blog.createdAt)}</span>
+          </div>
+
+          <BlogEngagement blog={blog} compact className="flex-shrink-0" />
+        </div>
       </div>
     </article>
   )
