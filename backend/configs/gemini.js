@@ -1,11 +1,14 @@
+import 'dotenv/config';
 import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY
-});
 
 async function main(prompt) {
     try {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            throw new Error('GEMINI_API_KEY is not configured in backend/.env');
+        }
+
+        const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: prompt
